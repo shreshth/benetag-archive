@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript" src="scripts/benetagpopover.js"></script> 
+		
+		<script>
+		function deleteworker(id) {
+			var data = {
+                    id: id,
+                }
+			$.ajax({
+                       type: 'GET',
+                       url: "http://{{HOSTNAME}}/deleteworker",
+                       data: data,
+                    });
+			document.getElementById('worker_' + id).className = "hidden";
+		}
+		
+		</script>
+	</head>
+	
+	<body>
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">					
+			
+			<div class="row">
+				<div class="span12">
+					<p class="product-name"><a href="viewproducer?id={{producer.key}}">{{producer.name}}</a></p>
+					<p class="section-heading"> All Workers </p>
+					<hr class="top-line spaced">
+				</div>
+			</div>			
+			
+			<!-- Workers in locations -->
+			{% for location in locations %}
+				<div class="row">
+					<div class="span12 bottom-padded">	
+						<p class="info" id="location_{{location.key}}">Workers at <a href="/viewlocation?id={{location.key}}">{{location.name}}</a></p>
+					</div>
+					{% for worker in location.getWorkers %}
+						<div class="span4" id="worker_{{worker.key}}" name="worker_{{worker.key}}">
+							<table class="searchtable">
+								<!-- Delete modal -->
+								{% if can_edit_local %}
+								<div class="modal hide fade" id="myModal_{{worker.key}}">
+									<div class="modal-header">
+										<button class="close" data-dismiss="modal">×</button>
+										<h3>Delete this entry?</h3>
+									</div>
+									<div class="modal-body">
+										<p>Are you sure you want to delete this worker? All products and locations linked to this worker will be affected.</p>
+									</div>
+									<div class="modal-footer">
+										<button class="btn" data-dismiss="modal">Close</button>
+										<a class="btn btn-danger" href="#" onclick="deleteworker('{{worker.key}}'); return false;" data-dismiss="modal"><i class="icon-trash btn-icon icon-white"></i> Delete this worker</a>
+									</div>
+								</div>
+								{% endif %}
+								<tr class="list-padded">
+									<!-- image + buttons -->
+									<td class="searchtable img">
+										<ul class="thumbnails">
+											<li class="searchthumb">
+											<a href="/viewworker?id={{worker.key}}" class="thumbnail">
+												<img src="workerimage?id={{worker.key}}"></img>
+											</a>
+											{% if can_edit_local %}
+											<div class="top-padded-small">
+												<center>
+												<a rel="popover" title="Edit {{worker.name}}" href="/editworker?id={{worker.key}}"><i class="icon-edit btn-icon"></i></a>
+												<a rel="popover" class="left-padded" title="Delete {{worker.name}}" data-toggle="modal" href="#myModal_{{worker.key}}"><i class="icon-trash btn-icon"></i></a>
+												</center>
+											</div>
+											{% endif %}
+											</li>
+										</ul>
+									</td>
+									<!-- info -->
+									<td class = "searchtable info" >
+										<p class="info"><a href="/viewworker?id={{worker.key}}">{{worker.name}}</a></p>
+										<p class="sub">{{worker.shortDescription}}</p>
+									</td>
+								</tr>
+							</table>
+						</div>
+						{% empty %}
+							<script>
+								document.getElementById('location_{{location.key}}').innerHTML = "";
+							</script>
+					{% endfor %}	
+				</div>
+			{% endfor %}
+			
+			<!-- Workers with no locations -->
+			<div class="row">
+				{% if num_worker_no_location > 0 %} 
+					<div class="span12">
+						<p class="info">Workers with no assigned location</p> 
+					</div>
+					
+					{% for worker in workers %}
+						{% if not worker.getLocation %}
+							<div class="span4" id="worker_{{worker.key}}" name="worker_{{worker.key}}">
+								<table class="searchtable">
+									<!-- Delete modal -->
+									{% if can_edit_local %}
+									<div class="modal hide fade" id="myModal_{{worker.key}}">
+										<div class="modal-header">
+											<button class="close" data-dismiss="modal">×</button>
+											<h3>Delete this entry?</h3>
+										</div>
+										<div class="modal-body">
+											<p>Are you sure you want to delete this worker? All products and locations linked to this worker will be affected.</p>
+										</div>
+										<div class="modal-footer">
+											<button class="btn" data-dismiss="modal">Close</button>
+											<a class="btn btn-danger" href="#" onclick="deleteworker('{{worker.key}}'); return false;" data-dismiss="modal"><i class="icon-trash btn-icon icon-white"></i> Delete this worker</a>
+										</div>
+									</div>
+									{% endif %}
+									<tr class="list-padded">
+										<!-- image + buttons -->
+										<td class="searchtable img">
+											<ul class="thumbnails">
+												<li class="searchthumb">
+												<a href="/viewworker?id={{worker.key}}" class="thumbnail">
+													<img src="workerimage?id={{worker.key}}"></img>
+												</a>
+												{% if can_edit_local %}
+												<div class="top-padded-small">
+													<center>
+													<a rel="popover" title="Edit {{worker.name}}" href="/editworker?id={{worker.key}}"><i class="icon-edit btn-icon"></i></a>
+													<a rel="popover" class="left-padded" title="Delete {{worker.name}}" data-toggle="modal" href="#myModal_{{worker.key}}"><i class="icon-trash btn-icon"></i></a>
+													</center>
+												</div>
+												{% endif %}
+												</li>
+											</ul>
+										</td>
+										<!-- info -->
+										<td class = "searchtable info" >
+											<p class="info"><a href="/viewworker?id={{worker.key}}">{{worker.name}}</a></p>
+											<p class="sub">{{worker.shortDescription}}</p>
+										</td>
+									</tr>
+								</table>
+							</div>
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+			</div>
+			
+			<div class="row">
+				<div class="span12">	
+					{% if no_workers %}
+						<div class="bottom-padded">
+							<div class="alert">
+								{% if can_edit_local %} <h4 class="alert-heading">Go ahead, add some workers!</h4>
+								{% else %} <h4 class="alert-heading">Whoa!</h4> Looks like they haven't added any workers yet!
+								{% endif %}
+							</div>
+						</div>
+					{% endif %}
+			
+					{% if can_edit_local %}
+						<a class="btn btn-primary" href="/createworker"><i class="icon-plus-sign icon-white btn-icon"></i> Add a worker</a>
+					{% endif %}
+				</div>
+			</div>
+	
+			{% include "footer.html" %}
+			
+		</div>
+	</body>
+</html>

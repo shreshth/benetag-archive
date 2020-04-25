@@ -1,0 +1,76 @@
+<html>
+<head>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="stylesheets/benetag-bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="stylesheets/mobilepage.css" />
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css"/>
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet" type="text/css"/>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+
+<script type="text/javascript" src="stylesheets/js/bootstrap-collapse.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-alert.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-transition.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-dropdown.js"></script>
+<script type="text/javascript" src="scripts/benetagalert.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-tooltip.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-popover.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-modal.js"></script>
+		
+		<title>BeneTag</title>
+  </head>
+  
+  <p class="logo"> <a href="./">Bene<strong>Tag</strong></a></p>
+<hr class="top-line spaced">
+
+<body bgcolor="ffffff">
+<div class="container">
+ <h1 class = "all-padded">Report:</h1>
+ <br>
+<P class = "all-padded">Working on BeneTag together has been a blast.  Over the course of this semester, we have bonded as a team both inside and outside of the classroom.  We are excited with how far we’ve come with BeneTag, and we are eager to continue working on it in the future.
+
+<P class = "all-padded">The vision and potential for BeneTag has become more compelling for us as the project has progressed.  In our initial planning meetings, we actually decided to pursue a different project, dubbed “Princeton Heat Map.”  The idea for that project was to track mobile traffic on Princeton’s wifi routers to estimate crowd density at eating clubs, study spaces, and dining halls.  However, we soon found out that OIT would be unable provide the necessary data.  Therefore, we decided to pivot to BeneTag.  We have not looked back since.
+
+<P class = "all-padded">The pacing of our work on BeneTag was initially driven by our participation in the TigerLaunch Business Plan Competition, which was held on April 7th.  To prepare for the competition, we wrote a business plan, rehearsed a ten minute presentation, and coded up a working prototype of our product.  All of this early work put us in good position to meet our project milestones.  Furthermore, the competition was instrumental in making the grand vision of BeneTag salient to all of the members of the team.  The feeling that we were working on something of greater importance was very helpful in providing intrinsic motivation in the weeks to follow.  After winning 3rd place at TigerLaunch, we made significant changes to the object model and design.  We were also able to recruit our first two real producers: Ubomi Beads and My Card My Story.
+
+<h2 class = "all-padded">Organization:</h2>
+
+<P class = "all-padded">As with many student group projects, our organizational structure was flat rather than hierarchical.  This structure allowed us to foster a collaborative atmosphere where any member of the team could assign tasks to other members.  In the early stages, each team member worked on a clearly defined weekly assignment.  This worked well.  Then, towards the middle of the project, our group communication faltered and people started working more independently.  This led to an uneven distribution of labor.  Finally, for the latter part of our project, we started using issue-tracking as a dominant mode of communication.  This communication structure was extremely helpful for fixing bugs and modifying features.
+
+<P class = "all-padded">As with most Princeton group collaborations, it was difficult to find enough time to meet as a full group.  When we did meet together, our sessions were very productive, and we were able to chart a broad vision for our features and architecture.  However, many of the features were subsequently implemented by individual team members.  It would have been nice to establish a more immediate feedback loop between working on a feature and getting comments on it from the rest of the team.  We would have had a better shot at getting things right the first time if we’d spent more time discussing exactly what we needed for our backend.  In practice, the backend was rewritten 3 times.  This probably could have been avoided.
+
+<P class = "all-padded">Lastly, the technological substitutions for in-person meetings were decent, but not great.  Since we had a large group (N=5), we had to overcome the <a href="http://blakemasters.tumblr.com/post/21437840885/peter-thiels-cs183-startup-class-5-notes-essay">n-squared communication problem</a>, in which there are ~N^2  (10) pairwise communication channels to maintain.  Initially, we relied on email to communicate.  However, email threads became annoying once a particular thread reached more than 20 messages.  Many messages were dedicated to finding a good time to meet.  The conventions of email felt more well-suited to planning rather than real-time collaboration.  Later, we successfully switched to the issue-tracking system provided by BitBucket, our code repository.  This proved to be an extremely productive communication system.  Issues could be assigned to individual team members, and an organized list of open issues was now easy to access.  The conventions of this system encouraged us to rapidly post issues whenever they were noticed and provided a much tighter feedback loop.
+
+<h2 class = "all-padded">Lessons:</h2>
+
+<P class = "all-padded">“Don’t get bogged down by frameworks.  Just because you’re using Django doesn’t mean you can’t use JQuery.”
+
+<P class = "all-padded">“Search around for the best tools - don’t try to reinvent the wheel.  There’s a very high probability that what you’re trying to do has already been done.”
+
+<P class = "all-padded">“Watch out for features that rely on other peoples’ APIs and documentation.  You may find yourself facing unexpected, arbitrary constraints.”
+
+<P class = "all-padded">“Use an issue management system.”
+
+<P class = "all-padded">“Adopt best practices wherever possible - don’t write bad code expecting to come back to it.  You won’t.”
+
+<P class = "all-padded">“Establish conventions with naming variables and functions (we struggled with that).  Establish areas of ownership where you can, but also work across the product wherever possible.”
+
+
+<h2 class = "all-padded">Back-end commentary:</h2>
+
+<P class = "all-padded">Our decision to run Django on Google App Engine has served us well so far.  The main advantage has been convenience: Google App Engine is well documented, easy to use, and provides good Python drivers for database use.  We also used Google’s authentication service for our user model.  However, Google App Engine imposes certain constraints on upload size and key/value pairs, runs slowly sometimes, and scales poorly.  Therefore, to gain maximum flexibility and scalability, we may decide to switch to Amazon EC2 in the future.  This switch will cost us a substantial effort, since the object model relies on the particulars of Google’s datastore design.  Nonetheless, at this point, we have no regrets about using Google App Engine to quickly (and cheaply) push out a working version of BeneTag.
+
+<h2 class = "all-padded">Front-end commentary:</h2>
+
+<P class = "all-padded">We purposely adopted a minimalist front end design.  Our initial design effort focused on the mobile platform.  We made this choice because we expect consumers to interact with BeneTag product pages primarily through mobile devices.  The space constraints of mobile web pages limited the number of UI elements that can be displayed on each page.  Thus, while our back-end design supports a large amount of data, only a subset of the data is currently represented in the UI.  In thinking about the design of our product pages, we have erred on the side of simplicity as opposed to simply pushing out all the cool features we can think of.  
+
+<P class = "all-padded">Next, iterating our design with real producers was a great experience.  The first major improvement to come out of these discussions was a refinement to the object model.  In our original object model, each product was tied to exactly one factory.  However, through working with My Card My Story, we realized that most real products are manufactured along a chain of factories and workshops.  To capture the idea of a supply chain, we allowed producers to add numerous locations and to organize the locations into a directed path.  This feature allows consumers to see the path that a product has taken from manufacturing facility to point of purchase.  Another feature that came out of our usability tests was the visual highlighting of navigation bar tabs, which helps producers keep track of what section they are working on.
+
+<P class = "all-padded">Lastly, it was extremely satisfying to make real product pages with our first two consumers, Ubomi Beads and My Card My Story.  The entire process of onboarding a producer took only 20 minutes, and gives us confidence that our UI design is intuitive and easy to use.  One value that BeneTag adds for producers is that it significantly lowers the barrier for a small producer like Ubomi Beads to create a compelling mobile page for their products that can be accessed at the point of purchase.  All a producer has to do is fill out a form, and BeneTag creates a well-formatted page.  We’ve come a long way from the days when all of our buttons were misplaced.
+
+<h2 class = "all-padded">Future:</h2>
+
+<P class = "all-padded">While the basic architecture of BeneTag is relatively mature, we are still in the early stages of building our content.  We are proud to have Ubomi Beads and My Card My Story on our platform, but we envision a future in which BeneTag hosts an entire marketplace of products.  Towards that end, we are working on an API, which will allow producers to quickly and easily transfer product data from existing databases to BeneTag.  To recruit more producers, we plan on using our relationship with the U-Store to encourage more producers in the immediate Princeton community to adopt BeneTag.  With two of our seniors graduating, we also hope to evangelize BeneTag in Seattle and San Fransisco, where there is a large population of socially conscious consumers.  As more products come online, we will continue to iterate our design to meet the needs of new producers.  Lastly, we are working on aggregating the fragmented universe of data on ethical and sustainable practices, so that we can provide independent 3rd party validation of socially responsible producers.  This service will be extremely valuable to consumers and producers alike.  We will be sure to keep you updated on our progress!
+</div>
+</body>
+</html>

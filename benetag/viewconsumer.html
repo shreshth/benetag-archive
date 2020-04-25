@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+	</head>
+
+	<body>
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+			
+			<div class="row">
+				<div class="span6">
+					<div class="visible-phone">
+						<img src="consumerimage?id={{id}}" class="searchthumb pull-right"></img>
+					</div>
+				
+					<p class="section-heading">Consumer Profile</a></p>
+					<p class="product-name">{{name}}</a></p>
+					{% if email_public %} <p class="bottom-padded">{{email_public}}</p> {% endif %}				
+					
+					{% if can_edit %}
+					<div class="bottom-padded">
+						<a class="btn "href="{{edit_link}}"><i class="icon-edit btn-icon"></i> Edit your profile</a>
+					</div>
+					{% endif %}
+					
+					{% if profile %}
+						<hr class="top-line spaced">
+						<p class="section-heading">About:</p>
+						<p id = "info">{{profile|linebreaksbr}}</p>
+					{% endif %}
+				</div>
+				
+				<div class="span6 hidden-phone">
+					<img class="pull-right" src="consumerimage?id={{id}}" style="width:inherit;"></img>
+				</div>	
+			</div>
+
+			<div class="top-padded">
+                <hr class="top-line spaced">
+            </div>	
+			
+			<div class="row">
+				<div class="span12">
+					<p class="section-heading">
+						{% if can_edit %}
+						<a href="/mycloset">Closet</a>
+						{% else %}
+						<a href="/viewcloset?id={{id}}">Closet</a>
+						{% endif %}
+					</p>
+					<table class="searchtable">
+						{% for p in products %}
+							<tr>
+								<!-- image -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/view?id={{p.key}}" class="thumbnail">
+                                            <img src="productimage?id={{p.key}}"></img>
+                                        </a>
+                                        <li>
+                                    </ul>
+                                </td>
+								<!-- info -->
+                                <td class = "searchtable info" >
+                                    <p class="search">
+										<a href="/view?id={{p.key}}">{{p.name}}</a>
+									</p>
+									<p class="search">by <a class="search sub" href="/viewproducer?id={{p.getProducer.key}}">{{p.getProducer.name}}</a></p>
+                                    <p class="search sub">{{p.shortDescription}}</p>
+                                </td>		
+							</tr>
+						{% empty %}
+							<div class="alert alert-block">
+								<h4 class="alert-heading">Whoa!</h4>
+								{% if can_edit %} Looks like you haven't added any products yet!
+								{% else %} Looks like they haven't added any products yet!
+								{% endif %}
+							</div>
+						{% endfor %}
+					</table>
+					<hr class="separator-line visible-phone">
+					{% if can_edit %} <a class="btn" href="/mycloset"><i class="icon-chevron-right btn-icon"></i> See all</a>
+					{% else %} <a class="btn" href="/viewcloset?id={{id}}"><i class="icon-chevron-right btn-icon"></i> See all</a>
+					{% endif %}
+				</div>
+			</div>
+
+			{% include "footer.html" %}
+		</div>
+	</body>
+</html>

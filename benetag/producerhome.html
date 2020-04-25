@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	{% include "styles.html" %}
+    <title>BeneTag</title>
+    
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript">
+          function validateForm()
+          {
+              var x=document.forms["search"]["query"].value;
+              if (x==null || x=="")
+              {
+                  insertAlertMarkup('alert', 'Come on, help our search bot out! Tell it what to search for.', 'warning');
+                  return false;
+              }
+          }
+    </script>
+  </head>
+  <body>
+    
+    <div class="container">
+			
+		{% include "navbar.html" %}
+		{% include "headerlogo.html" %}
+		
+		{% if verifyone %}
+		<div class="row">
+		<div class="span6 offset3">
+		<div class="alert span5">
+  				<button class="close" data-dismiss="alert">×</button>
+  				<strong>Thank you for joining BeneTag</strong>. Our representatives will be in contact with you to verify your account.
+				In the meanwhile, feel free to browse the site and look at our <a href="/producertutorial">tutorial for producers</a> to 
+				get you started.				
+		</div>
+		</div>
+		</div>
+		{% endif %}
+		{% if verify %}
+		<div class="row">
+		<div class="span6 offset3">
+		<div class="alert alert-error span5">
+  				<button class="close" data-dismiss="alert">×</button>
+  				<strong>Can't do that yet!</strong> You must wait to be verified as a producer. 
+		</div>
+		</div>
+		</div>
+		{% endif %}
+		{% if not_owner %}
+		<div class="row">
+		<div class="span6 offset3">
+		<div class="alert alert-error span5">
+  				<button class="close" data-dismiss="alert">×</button>
+  				You cannot edit that item as you do not own it.
+		</div>
+		</div>
+		</div>
+		{% endif %}
+		{% if not_exist %}
+		<div class="row">
+		<div class="span6 offset3">
+		<div class="alert alert-error span5">
+  				<button class="close" data-dismiss="alert">×</button>
+  				That item does not exist.
+		</div>
+		</div>
+		</div>
+		{% endif %}
+		
+		{% include "search.html" %}
+		
+		<div class="row hidden-phone" style="text-align:center">	
+			<div class="btn-toolbar">
+				<div class="btn-group">
+					<a class="btn" href='/createproduct'>Create Product</a>
+					<a class="btn" href='/createlocation'>Add a Location</a>
+					<a class="btn" href='/createworker'>Add a Worker Profile</a>
+					
+				</div>
+			</div>
+		</div>
+		
+		<div class="row visible-phone" style="text-align:center">
+			<div class="btn-group">
+				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"> Add data <span class="caret"></span> </a>
+				<ul class="dropdown-menu" align="center">
+					<li><a href='/createlocation'>Add a Location</a></li>
+					<li><a href='/createworker'>Add a Worker Profile</a></li>
+					<li><a href='/createproduct'>Create Product</a></li>
+				</ul>
+			</div>
+		</div>
+		
+		{% include "footer.html" %}
+		
+	</div>
+
+	</body>
+</html>

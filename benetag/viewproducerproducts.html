@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+		
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript" src="scripts/benetagpopover.js"></script>
+	</head>
+	
+	<body>
+	
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+			
+			<div class="row">
+				<div class="span12">
+					<p class="product-name"><a href="viewproducer?id={{producer.key}}">{{producer.name}}</a></p>
+					<p class="section-heading"> All Products </p>
+					<hr class="top-line spaced">
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="span8">
+					<table class="searchtable bottom-padded">
+						{% for product_line in product_lines %}
+							<!-- Delete modal -->
+							{% if can_edit_local %}
+								<div class="modal hide fade" id="myModal_{{product_line.key}}">
+									<div class="modal-header">
+										<button class="close" data-dismiss="modal">×</button>
+										<h3>Delete this entry?</h3>
+									</div>
+									<div class="modal-body">
+										<p>Are you sure you want to delete this product line? All products, workers and factories linked to it will be affected.</p>
+									</div>
+									<div class="modal-footer">
+										<button class="btn" data-dismiss="modal">Close</button>
+										<a class="btn btn-danger" href="/deleteline?id={{product_line.key}}"><i class="icon-trash btn-icon icon-white"></i> Delete this product line</a>
+									</div>
+								</div>					
+							{% endif %}
+							<tr class="list-padded">
+                                <!-- image + buttons -->
+                                <td class="searchtable img-large hidden-phone">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb-large">
+                                        <a href="/view?id={{product_line.key}}" class="thumbnail">
+                                            <img src="productimage?id={{product_line.key}}"></img>
+                                        </a>
+										{% if can_edit_local %}
+										<div class="top-padded-small">
+											<center>
+												{% if product_line.numConfigs > 1 %}
+													<a rel="popover" class="" title="Edit this line" href="/editproduct?id={{product_line.key}}"><i class="icon-edit btn-icon"></i></a>
+												{% else %}
+													<a rel="popover" class="" title="Edit this line" href="/editconfig?id={{product_line.getConfigs.get.key}}"><i class="icon-edit btn-icon"></i></a>
+												{% endif %}
+												{% if product_line.numConfigs == 1 %}
+													<a rel="popover" class="left-padded" title="Print new QR codes for this line" href="/createunits?id={{product_line.getConfigs.get.key}}"><i class="icon-qrcode btn-icon"></i></a>
+												{% endif %}
+												<a rel="popover" class="left-padded" title="Add new configuration to this line" href="/createconfig?id={{product_line.key}}"><i class="icon-plus btn-icon"></i></a> 
+												<a rel="popover" class="left-padded" title="Message people who own this product" href="/producerwritemsg?id={{product_line.key}}"><i class="icon-envelope btn-icon"></i></a> 
+												<a rel="popover" class="left-padded" title="Delete this line" data-toggle="modal" href="#myModal_{{product_line.key}}"><i class="icon-trash btn-icon"></i></a>												
+											</center>
+										</div>
+										{% endif %}
+										</li>
+                                    </ul>
+                                </td>
+                                <!-- info -->
+                                <td class = "searchtable info">
+
+                                <div class="left-padded">
+
+									<p class="info"><a href="/view?id={{product_line.key}}">{{product_line.name}}</a></p>
+                                    <p class="sub">{{product_line.shortDescription}}</p>  
+                                    
+                                    <div class = "visible-phone bottom-padded">
+                                        {% if product_line.numConfigs > 1 %}
+                                            <a class="" title="Edit this line" href="/editproduct?id={{product_line.key}}"><i class="icon-edit btn-icon"></i></a>
+                                        {% else %}
+                                            <a class="" title="Edit this line" href="/editconfig?id={{product_line.getConfigs.get.key}}"><i class="icon-edit btn-icon"></i></a>
+                                        {% endif %}
+                                        {% if product_line.numConfigs == 1 %}
+                                            <a class="left-padded" title="Print new QR codes for this line" href="/createunits?id={{product_line.getConfigs.get.key}}"><i class="icon-qrcode btn-icon"></i></a>
+                                        {% endif %}
+                                        <a class="left-padded" title="Add new configuration to this line" href="/createconfig?id={{product_line.key}}"><i class="icon-plus btn-icon"></i></a> 										
+										<a class="left-padded" title="Message people who own this product" href="/producerwritemsg?id={{product_line.key}}"><i class="icon-envelope btn-icon"></i></a> 
+										<a class="left-padded" title="Delete this line" data-toggle="modal" href="#myModal_{{product_line.key}}"><i class="icon-trash btn-icon"></i></a>
+                                    </div>
+                                    
+                                    
+                                    {% if product_line.numConfigs > 1 %}
+									<div class="">
+										<p class="search">{{product_line.numConfigs}} manufacturing configuration{% if product_line.numConfigs > 1%}s{% endif %}:</p>
+										<ul>
+											{% for product_config in product_line.getConfigs %}
+												<!-- Delete modal -->
+												{% if can_edit_local %}
+												<div class="modal hide fade" id="myModal_{{product_config.key}}">
+													<div class="modal-header">
+														<button class="close" data-dismiss="modal">×</button>
+														<h3>Delete this entry?</h3>
+													</div>
+													<div class="modal-body">
+														<p>Are you sure you want to delete this configuration? All products linked to it will be affected.<br /> {% if product_line.numConfigs == 1 %} Additionally, since this is the last configuration of this product line, the entire product line will be deleted. {% endif %}</p>
+													</div>
+													<div class="modal-footer">
+														<button class="btn" data-dismiss="modal">Close</button>
+														<a class="btn btn-danger" href="/deleteconfig?id={{product_config.key}}"><i class="icon-trash btn-icon icon-white"></i> Delete this configuration</a>
+													</div>
+												</div>
+												{% endif %}
+												
+												<li><p class="search sub"><a href="/view?id={{product_config.key}}">{{product_config.config_name}}</a>													
+												
+												{% if can_edit_local %} 
+												<a rel="popover" class="left-padded" title="Edit this configuration" href="/editconfig?id={{product_config.key}}"><i class="icon-edit btn-icon"></i></a>
+												<a rel="popover" class="left-padded" title="Print new QR codes for this configuration" href="/createunits?id={{product_config.key}}"><i class="icon-qrcode btn-icon"></i></a>												
+												<a rel="popover" class="left-padded" title="Message people who own this configuration" href="/producerwritemsg?id={{product_config.key}}"><i class="icon-envelope btn-icon"></i></a>
+												<a rel="popover" class="left-padded" title="Delete this configuration" data-toggle="modal" href="#myModal_{{product_config.key}}"><i class="icon-trash btn-icon"></i></a>
+												{% endif %}
+												</p>
+												</li>
+											{% endfor %}
+											</ul>
+									</div>
+									{% endif %}
+                                   </div> 
+                                </td>
+                                
+                            </tr>							
+							
+						{% empty %}
+							<div class="alert">
+								{% if can_edit_local %} <h4 class="alert-heading">Go ahead, add some products!</h4>
+								{% else %} <h4 class="alert-heading">Whoa!</h4> Looks like they haven't added any products yet!
+								{% endif %} 	
+							</div>
+							
+						{% endfor %}
+					
+						
+					</table>
+					
+					{% if can_edit_local %}				
+					<a class="btn btn-primary" href="/createproduct"><i class="icon-plus-sign icon-white btn-icon"></i> Add a product line</a>
+					{% endif %}
+				</div>
+			</div>
+	
+			{% include "footer.html" %}
+			
+		</div>
+	
+	</body>
+
+</html>

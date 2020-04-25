@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag - Sent messages</title>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+	    	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	</head>
+
+	<body>
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+
+			<div class="row">
+				<div class="span8">
+			
+					<form class="form-horizontal">	
+						<fieldset>
+						<legend>Sent messages</legend>
+
+						{% for msg in messages %}
+						<div class="control-group">
+							<label class="control-label" for="name">
+								{% if msg.receiver.isConfig %} 
+								To people who own <a href="/view?id={{msg.receiver.getProductLine.key}}">{{msg.receiver.name}}</a> 
+								(<a href="/view?id={{msg.receiver.key}}">{{msg.receiver.config_name}}</a>) 
+								{% else %} 
+								To people who own <a href="/view?id={{msg.receiver.key}}">{{msg.receiver.name}}</a>
+								(<a href="/view?id={{msg.receiver.key}}">all configs</a>) 
+								{% endif %}
+							</label>
+							<div class="controls">
+								<p>{{msg.text}}</p>
+								<p class="help-block">This message was sent to {{msg.num_receivers}} people.</p>
+							</div>
+						</div>
+						{% empty %}
+						<div class="top-padded">
+                            <div class="alert">
+                                <h4 class="alert-heading b">Nothing here!</h4> 
+                                You haven't sent any messages to consumers yet. You can send one from <a href="/myproducts">your products page</a> by clicking on the <i class="icon-envelope btn-icon"></i> icon next to a product. Don't spam.
+                            </div>
+					    </div>
+						{% endfor %}
+						</fieldset>
+					</form>
+				</div>	
+			</div>
+
+			{% include "footer.html" %}
+		</div>  
+  	</body>
+</html>

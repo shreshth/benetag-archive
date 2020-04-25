@@ -1,0 +1,171 @@
+<html>
+<head>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="stylesheets/benetag-bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="stylesheets/mobilepage.css" />
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css"/>
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet" type="text/css"/>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+
+<script type="text/javascript" src="stylesheets/js/bootstrap-collapse.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-alert.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-transition.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-dropdown.js"></script>
+<script type="text/javascript" src="scripts/benetagalert.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-tooltip.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-popover.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-modal.js"></script>
+		
+		<title>BeneTag</title>
+  </head>
+  
+  <p class="logo"> <a href="./">Bene<strong>Tag</strong></a></p>
+<hr class="top-line spaced">
+
+
+<body bgcolor="ffffff">
+<div class="container">
+ <h1 class = "all-padded"> Timeline</h1>
+<p class = "all-padded"><b>March 27</b> <br> Set up Development Environments. Decision to fork separate copies for each member of the team and then to push upstream when changes are to be committed. Object model discussions, interface ideas and initial research delegated. Ideas for badges discussed. 
+
+<p class = "all-padded"><b>April 5 - 9</b><br>
+Investigated an open, free font. Open Sans from Google Web Fonts is the current choice.<br>
+Finalized an aesthetic and layout for the Mobile Product Page.<br>
+Set up LESS environment and further studied bootstrap to scale up the CSS design.<br>
+
+MobilePage added, it refers to the Mobile Product View page.<br>
+CSS changed to implement new design. <br>
+Location script implemented to dynamically generate how far factory is on product page.<br>
+AJAX Badge generation system started.
+<br>
+<p class = "all-padded"><b>April 9 - 10</b><br>
+Worked on ensuring 2 assumptions always hold 1) You must always sign in first before you can do anything. Without signing in, you can only search for products. 2) If you sign in as a producer, you must save your profile (even if its not complete) before creating anything new. This ensures that every product/factory/worker can link back to a single producer.<br>
+Fixed the object model so things inherit from each other properly (factories have only one producer, workers have only one employer)<br>
+Fixed a lot of corner cases. Things shouldn’t break anymore if you do things out of order (like create a product before creating a producer). Things also won’t break if you do things which are illegal, like adding a product with no name, but that can be fixed later.<br>
+Added a separate login page before the main home page. Have a separate home page for producers<br>
+Also managed to break the badges. For some reason, you can no longer upload images for the badge. It just stores it as the name of the badge. Need to fix this.<br>
+Added pinterest button link on the product page.
+<br>
+<p class = "all-padded"><b>April 10</b><br>
+Added the relationship between workers and the products they make.<br>
+Added a unique identifier for products, workers, factories. This is basically FOR THE PRODUCER to keep track of their products and easily edit them later. It will also be useful if we’re planning to have an API to automate the import of a producer’s data. As an added benefit, it also allows us to identify if they are accidentally adding the same worker/factory again.<br> 
+NOTE that the identifier is completely optional! Our code shouldn’t break if the producer doesn’t specify it. The sole point of it is to make it easier for producers to import their inventories and be able to mess around with them as they want.<br>
+For security, all products, factories, workers are now ‘owned’ by the user who created them.
+<br>
+<p class = "all-padded"><b>April 14 - 16</b><br>
+Prettified mobile product view, home, producer home, search results pages. <br>
+Fixed location bug on mobile product page. <br>
+Added textures, fixed spacing issues, unified font usage, updated css to cover a large variety of font cases. <br>
+Figured out how to use bottlenose, a python wrapper program for interfacing with the Amazon Product API, to return the price and url of a product.
+<br>
+<p class = "all-padded"><b>April 19 - 20</b><br>
+Lots of changes today<br>
+Security stuff for consumer vs. producer<br>
+Created pages for editing producer profile, and worker/factory/product pages<br>
+Consumer side added
+
+<p class = "all-padded"><b>April 21</b><br>
+More huge changes<br>
+Effectively rewrote the entire backend. Made it more cohesive and sensible and stylistically better<br>
+Closet works<br>
+Added personal pages for:<br> 
+-consumer (to view my closet, view my profile)<br>
+-producer (view my profile, view my factories/workers/products)<br>
+Need to add these personalized things to a dashboard to be displayed under the header at all times if you’re signed in<br>
+Done. There is now a dashboard on the top of each page - varies for whether you are producer/consumer/not signed in<br>
+Shifted all pages to new css look. Made sure things work at least on mobile pages. <br>
+
+<p class = "all-padded"><b>April 22</b><br>
+More huge changes<br>
+So turns out our bootstrap compilation isn’t including the responsive compiling. Fixed mobile-page.css to account for this. Now can move to desktop website.
+Added navbar. 
+
+<p class = "all-padded"><b>April 23</b><br>
+Error handling <br>
+- added 404 pages for not found<br>
+- bootstrap alerts for empty fields<br>
+Made navbar cooler - added search bar, all navigation buttons, plus edit buttons etc.<br>
+Added Amazon product search<br>
+Shifted to Django 1.2 and Python 2.7
+
+<p class = "all-padded"><b>April 24</b><br>
+Protected against XSS attacks by escaping tags.<br>
+No need to protect against injection since we never explicitly query the datastore<br>
+Users can now sign in as both producers and consumers
+
+<p class = "all-padded"><b>April 25 - 26</b><br>
+Added navbar focus elements - when you click on a link, the button becomes active.<br>
+Added product path - this is basically showing the path that the product took through multiple factories to get to you. Integrated this from product page
+Fixed multiple bugs with badges<br>
+All images work now<br>
+CHANGED OBJECT MODEL: Product split into 3 levels<br>
+-Product line - highest level e.g. iPhone<br>
+-Product config (the setting in which it was made) - e.g. iPhones made in Brazil vs. iPhones made in China<br>
+-Product units - each individual iPhone<br>
+All the information is stored in the product config. The product line inherits info from a ‘default’ configuration (set by producer). The units inherit information from their respective configuration. <br>
+If you edit a configuration, it cascades down to the units under it<br>
+WORKFLOW UNDER CHANGED MODEL:<br>
+-Add product line (the info provided becomes the default config)<br>
+-Add other configs if necessary, and edit them<br>
+-Add product units under a product config to generate the individual product page<br>
+QR codes are now shown when you create units - should be relatively easy to print<br>
+CLOSET can now contain both configs and individual pages - what to do about this? Is this okay?<br>
+Facebook comment stream added - all comments within a product line are consolidated<br>
+
+<p class = "all-padded"><b>April 28</b><br>
+Fixed all of the home pages.<br>
+Added prettier search with appended button and image. Checked on various browsers. IE is still a major pain for some reason. Navbar works on viewproduct but not on any other page. This makes no sense. <br>
+Added button groups on producer home. And blurbs on other pages.<br>
+Accounted for linebreak on mobile version of producer home, so added a dropdown.<br>
+Added new texture to liven up the website.<br>
+Changed logo to add YouTube like word separation.
+
+<p class = "all-padded"><b>April 29</b><br>
+Added different font weights<br>
+Added desktop version of producer profile page.<br>
+Added alignment space to headerlogo that’s only visible on desktops and tablets. This saves space on mobile. <br>
+Fixed Amazon so that no SearchIndex is required and it only returns the price and URL from the first result (the most accurate result).
+
+<p class = "all-padded"><b>April 30</b><br>
+Doing extensive testing, both ourselves and with users (conducted a usability test).<br>
+All forms given desktop versions, they’re all prettified now. <br>
+Clickable rating stars added so that consumers can view the cumulative ratings of other consumers on a given product and contribute their own rating. A consumer can rate a product multiple times but only the first will be recorded. 
+
+<p class = "all-padded"><b>May 1</b><br>
+Changed implementation of the stars so that they did not flash when the mouse hovered over them. 
+
+<p class = "all-padded"><b>May 3</b><br>
+Onboarded Ubomi Beads, our first real producer! <br>
+Created 3 configuration pages with 3 different necklace pictures.<br>
+Uploaded profiles and pictures for 4 workers
+
+<p class = "all-padded"><b>May 8</b><br>
+Created consumer inbox system, which allows producers to send messages to all owners of a product without spamming their real email.
+
+<p class = "all-padded"><b>May 9</b><br>
+Rehearse for demo<br>
+Standardized the facebook like<br>
+UI alignment issues fixed.
+
+<p class = "all-padded"><b>May 10</b><br>
+Form validation completed<br>
+404 error page handling<br>
+Internet explorer UI fixed
+
+<p class = "all-padded"><b>May 10 - 15</b><br>
+Onboard My Card My Story, our second real producer!<br>
+Contact U-Store representatives to discuss incorporating QR codes into the store display<br>
+Get feedback from Ubomi and My Card My Story about features and design for future iteration of the product.<br>
+Work on final report and documentation
+
+<p class = "all-padded"><b>May 13</b><br>
+Ratings system fixed: new ratings from the same user delete old ratings and update to new.<br>
+Fixed issues with duplicate names for workers and locations (Unique ID).<br>
+Major changes to the producer workflow: created separate edit-product and edit-config pates<br>
+Picture cropping feature added.<br>
+Amazon search function tweaked <br>
+Search displays thumbnails
+</div>
+</body>
+</html>

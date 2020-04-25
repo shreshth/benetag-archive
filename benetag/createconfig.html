@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+  	<head>
+	
+		{% include "styles.html" %}
+ 		<title>BeneTag - Create product configuration</title>		
+
+   		<script>
+		$(function() {
+			$( "#alllocations, #productlocations" ).sortable({
+				connectWith: ".draggablelocations"
+			}).disableSelection();		
+		});
+		</script>
+	
+		<script type="text/javascript">
+		function initialize() {
+			$( "#alllocations, #productlocations" ).sortable({
+   				stop: function(event, ui) {
+        				var data = [];
+        				$("#productlocations li").each(function(i, el) {
+            					data.push($(this).attr('name'));
+        				});
+        				$("input[id=orderedlocationsid]").val(data);
+        			}
+	    		});
+		}
+  		</script>
+  
+		<!-- Script to disambiguate two submits -->
+		<script type="text/javascript">
+		function onsubmitform()
+		{
+  			if(document.pressed == 'more')
+  			{
+   				document.createconfig.action ="/storeconfig?id={{id}}&more=True";
+  			}
+  			else
+  			if(document.pressed == 'exit')
+  			{
+    				document.createconfig.action ="/storeconfig?id={{id}}";
+  			}
+  			return true;
+		}
+		</script>
+
+		<!-- Script to open popup to create worker -->
+		<script>
+		function popupcreateworker() {
+			window.open("/createworker?popupproduct=True");
+		}
+		</script>
+
+		<!-- Script to open popup to create location -->
+		<script>
+		function popupcreatelocation() {
+			window.open("/createlocation?popupproduct=True");
+		}
+		</script>
+
+		<!-- Image upload and cropping script -->
+		<script type="text/javascript">
+			{% if cropentity.hasImage %}
+				var hasImage=true;
+			{% else %}
+				var hasImage=false;
+			{% endif %}
+		</script>
+		<script type="text/javascript" src="scripts/benetagimgcropedit.js"></script>
+
+	</head>
+
+  	<body onload="initialize(); initializecrop();">
+  	
+		<div class="container">
+			{% include "navbar.html" %}
+			<hr class="space">
+			
+    			<div class="row">
+				<div class="span8">
+		     			<form name="createconfig" onsubmit="finishcrop(); return onsubmitform();" enctype="multipart/form-data" method="post" class="form-horizontal">
+						<fieldset>
+						<legend>Create a new product configuration</legend>
+     					{% if added %}
+       					<div class="top-padded">
+							<div class="alert alert-success">
+								Product added successfully!
+							</div>
+						</div>
+     					{% endif %}
+     					{% if repeateditname %}
+						<div class="top-padded">
+							<div class="alert alert-danger">
+								A configuration with this name already exists. Please use a different name.
+							</div>
+						</div>
+						{% endif %}
+						{% if repeatprodname %}
+						<div class="top-padded">
+							<div class="alert alert-danger">
+								A product line with this name already exists. Please use a different name.
+							</div>
+						</div>
+						{% endif %}
+		
+						<!-- Name -->
+						<div class="control-group">
+							<label class="control-label" for="name">Product name</label>
+							<div class="controls">
+								<input name="name" type="text" id="name" value="{{name_old}}" required="True"></input>	
+								<p class="help-block">Name of the product line. Changing this will change all the configurations under this product line.</p>
+							</div>
+						</div>
+						<!-- Description -->
+						<div class="control-group">
+							<label class="control-label" for="description">Description</label>
+							<div class="controls">
+								<textarea name="description" id="description" rows="8">{{description_old}}</textarea>
+								<p class="help-block">A description of the product line. Changing this will change all the configurations under this product line
+							</div>		
+						</div>
+						<!-- Picture -->
+						<!-- cropping modal -->
+						<div class="modal hide fade" id="myModal">
+							<div class="modal-header">
+								<h3>Crop image</h3>
+							</div>
+							<div class="modal-body">
+								<img id="img_crop" name="img_crop"></img>
+							</div>
+							<div class="modal-footer">
+								<button class="btn" data-dismiss="modal">Save</button>
+							</div>
+						</div>
+						
+						<div class="hidden-desktop">
+							<div class="alert">
+                                Unfortunately you can only add a picture from a desktop machine.
+                            </div>
+						</div>
+						<div class="control-group hidden-phone">
+							<label class="control-label" for="picture">Picture</label>
+							<div class="controls">
+								<div name="file_div" id="file_div">
+									<input type="file" id="files" name="files[]" accept="image/*" />
+								</div>
+								<img class="hidden" id="preview" name="preview"></img> <!-- copy of image -->
+								<div class="top-padded">
+								{% if cropentity.hasImage %}
+									 <!-- old image -->
+									<img class="previewthumb" id= "old_img" name="old_img" src="/productimage?id={{id}}"></img>
+								{% else %}
+									<img class="hidden" id="old_img" name="old_img"></img>
+								{% endif %}
+								</div>
+								<canvas class="hidden" id="canvas" name="canvas" width="150" height="150"></canvas> <!-- preview canvas for cropping -->
+								<canvas class="hidden" id="canvashidden" name="canvashidden" width="150" height="150"></canvas> <!-- hidden canvas for cropping data -->
+								<textarea class="hidden" id="picturedata" name="picturedata"></textarea> <!-- actual return box -->
+								<div id="error_txt"></div> <!-- errors, if any -->
+								<a class="hidden" data-toggle="modal" href="#myModal" id="modal_trigger"></a> <!-- hidden modal trigger -->
+								<!-- delete and crop buttons -->
+								<button class="btn btn-danger hidden" id="delete" name="delete" onclick="refresh(); return false;">Delete</button>
+								<button class="btn hidden" id="crop_btn" name="crop_btn" onclick="forceCrop(); return false;">Crop</button>
+								<p class="help-block">A picture of the product. Changing this will change all the configurations under this product line (Max size: 512 kB) </p>
+							</div>		
+						</div>
+						<hr class="separator-line">
+						<!-- Config Name -->
+						<div class="control-group">
+							<label class="control-label" for="configname">Configuration name</label>
+							<div class="controls">
+								<input name="configname" type="text" id="configname" required="True"></input>
+								<p class="help-block">What differentiates this product configuration from other configurations? For example, were the products in this setting made in Brazil as opposed to China. Be sure to give a descriptive name, like 'Made in Brazil'.</p>
+							</div>
+						</div>
+						<hr class="separator-line">
+						
+						<!--Display Amazon or not -->
+						<div class="control-group">
+							<label class="control-label" for="displayAmazon">Display link to Amazon</label>
+							<div class="controls">
+								<input type="checkbox" name="displayAmazon" id="displayAmazon" checked="True"></input>
+							</div>
+						</div>
+						
+						<!--Add other store links -->
+						<div class="control-group">
+						    <p class="help-block">Add external store link (optional)</p></br>
+							<label class="control-label" for="storeName">Store Name</label>
+							<div class="controls">
+								<input name="storeName" id="storeName"></input>
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="storeLink">Store Link</label>
+							<div class="controls">
+								<input name="storeLink" id="storeLink"></input>
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="storePrice">Price on the store</label>
+							<div class="controls">
+                                <div class="input-prepend">
+                                    <span class="add-on">$</span><input class="span1" id="storePrice" name="storePrice"></input>
+                                </div>
+                                <p class="help-block">Only enter the dollar amount</p>
+							</div>
+						</div>
+						<hr class="separator-line">
+						
+						<!-- Path -->
+					    <div class="hidden-desktop">
+							<div class="alert">
+                                Unfortunately you can only change a product's path from a desktop machine.
+                            </div>
+						</div>
+					    <div class="control-group visible-desktop">
+							<label class="control-label" for="locations">Locations</label>
+							<div class="controls">
+								<div class="bottom-padded">
+									{% if no_locations %}
+										<div id="removelocationfrompopup" name="removelocationfrompopup">
+											<div class="alert">
+												You haven't added any locations yet. 
+												Add one by clicking the button below and you will be returned to this form with all your data afterwards. 
+											</div>
+										</div>
+									{% endif %}
+									{% if no_locations %}
+										<div class="hidden" id="showfrompopup" name="showfrompopup">
+									{% else %}
+										<div id="showfrompopup" name="showfrompopup">
+									{% endif %}
+											<p class="sub">The path that this product travels through your manufacturing locations. Drag entries from your locations on the left to this product's path on the right.</p> 
+											 
+											<table id="locations" class="pathselect well">
+												
+												<tr>
+												<td><p class="pathselect center">Your Locations</p></td>
+												<td><p class="pathselect center">This Product's Path</p></td>
+												</tr>
+												
+												
+												<tr>
+												<td class="pathselect" height="{{pathheight}}px">
+													<ul id="alllocations" class="draggablelocations">
+														{% for location in locations %}
+															<li class="ui-state-default" name="{{location.key}}">
+																<p>
+																<!--<i class="icon-th-list btn-icon"></i>-->
+																{{location.name}} {% if location.unique %} ({{location.unique}}) {% endif %}</p>
+															</li>
+														{% endfor %}
+													</ul>
+												</td>
+												<td class="pathselect" draggable="true">
+													<ul id="productlocations" class="draggablelocations">
+													</ul>
+												</td>
+												</tr>
+												
+											</table>
+										</div>
+								</div>
+								
+								<a class="btn btn-primary" href="#" onclick="popupcreatelocation();return false;"><i class="icon-plus-sign icon-white btn-icon"></i> Create new location</a>
+								<!--<a rel="popover" data-content="..."> [?] </a>-->
+							</div>		
+						</div>
+						
+						<hr class="separator-line">
+						<!-- Workers -->
+						<div class="control-group">
+							<label class="control-label" for="workers">Workers</label>
+							<div class="controls">
+								<div class="bottom-padded">
+									<div id="workerfrompopup" name="workerfrompopup">
+										{% for worker in workers %}
+											<label class="checkbox">
+												<input type="checkbox" name="workers" value ="{{worker.key}}">
+													{{worker.name}} {% if worker.unique %} ({{worker.unique}}) {% endif %} 
+												</input>
+											</label>
+										{% empty %}
+											<div id="removeworkerfrompopup" name="removeworkerfrompopup">
+												<div class="alert">
+													You haven't added any workers yet. 
+													Add one by clicking the button below and you will be returned to this form with all your data afterwards. 
+												</div>
+											</div>
+										{% endfor %}
+									</div>
+								</div>
+								<a class="btn btn-primary" href="#" onclick="popupcreateworker();return false;"><i class="icon-plus-sign icon-white btn-icon"></i> Create new worker</a>
+								<p class="help-block">The workers who work on this product</p>
+								<!--<a rel="popover" data-content="..."> [?] </a>-->
+							</div>		
+						</div>
+						<hr class="separator-line">
+						<!-- Badges -->
+						<div class="control-group">
+							<label class="control-label" for="badges">Badges</label>
+							<div class="controls">
+								{% for badge in badges %}
+								<label class="checkbox"><input type="checkbox" name="badges" value ="{{badge.key}}" id="badges">{{badge.name}}</input></label>
+								{% empty %}
+								<p id="badges">None exist</p>
+	  							{% endfor %}
+								<p class="help-block">The badges that apply to this product (requires documentation)</p>
+								<!--<a rel="popover" data-content="..."> [?] </a>-->
+							</div>		
+						</div>
+						<hr class="separator-line">
+						<!-- Hidden field -->
+						<input style="display:none" id="orderedlocationsid" name="orderedlocations" value=""></input>
+						<!-- Submit -->
+						<div class="pull-right">
+							<button type="submit" class="btn btn-primary" name="more" onclick="document.pressed=this.name">Save and create another</button>
+							<button type="submit" class="btn btn-primary" name="exit" onclick="document.pressed=this.name">Save and view configuration</button>
+							<a href="/" onclick="history.back(); return false;"><button type="cancel" class="btn">Cancel</button></a>	
+						</div>
+						</fieldset>			
+					</form>
+				</div>
+			</div>
+			{% include "footer.html" %}
+		</div>
+  	</body>
+</html>

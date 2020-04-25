@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag - Create products</title>
+	</head>
+
+	<body>
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+			<div class="row">
+				<div class="span8">
+					<form action="/storeunits?id={{id}}" enctype="multipart/form-data" method="post" class="form-horizontal">
+						<fieldset>
+						<legend>Create units</legend>
+					        <p class="top-padded">You are about to create a set of products with the following properties:</p>
+						<hr class="separator-line">
+						
+						<!-- Product name -->
+						<div class="control-group">
+							<label class="control-label" for="name">Product name</label>
+							<div class="controls">
+								<p id="name">{{name}}</p>
+							</div>
+						</div>
+						
+						<!-- Config name -->
+						<div class="control-group">
+							<label class="control-label" for="configname">Configuration name</label>
+							<div class="controls">
+								<p id="name">{{configname}}</p>
+							</div>
+						</div>
+						
+						<!-- Description -->
+						<div class="control-group">
+							<label class="control-label" for="description">Description</label>
+							<div class="controls">
+								<p id="name">{{description}}</p>
+							</div>
+						</div>
+						
+						{% if config.hasImage %}
+						<!-- Picture -->
+						<div class="control-group">
+							<label class="control-label" for="description">Picture</label>
+							<div class="controls">
+								<img class="searchthumb-large" src="/productimage?id={{id}}"></img>
+							</div>
+						</div>
+						
+						{% endif %}
+						<!-- Path -->
+						<div class="control-group">
+							<label class="control-label" for="locations">Path</label>
+							<div class="controls">
+								<ul id="locations">
+								{% for location in locations %}
+									<li><a href="/viewlocation?id={{location.key}}">{{location.name}}</a> {% if location.unique %} ({{location.unique}}) {% endif %}</li> 		
+	  							{% empty %}
+									None				
+	  							{% endfor %}
+								</ul>
+							</div>
+						</div>
+						
+						<!-- Workers -->
+						<div class="control-group">
+							<label class="control-label" for="workers">Workers</label>
+							<div class="controls">
+								<ul id="workers">
+								{% for worker in workers %}
+									<li><a href="/viewworker?id={{worker.key}}">{{worker.name}}</a> {% if worker.unique %} ({{worker.unique}}) {% endif %}</li> 		
+	  							{% empty %}
+									None				
+	  							{% endfor %}
+								</ul>
+							</div>
+						</div>
+						
+						<!-- Badges -->
+						<div class="control-group">
+							<label class="control-label" for="badges">Badges</label>
+							<div class="controls">
+								<ul id="badges">
+								{% for badge in badges %}
+									<li>{{badge.name}}</li> 		
+	  							{% empty %}
+									None				
+	  							{% endfor %}
+								</ul>
+							</div>
+						</div>
+						
+						<!-- Links -->
+						<div class="control-group">
+							<label class="control-label" for="link"></label>
+							<div class="controls">
+								<a class="btn" href="/editconfig?id={{id}}">Edit this configuration</a> 
+								<a class="btn" href="/view?id={{productline_id}}">View other configurations</a>
+							</div>
+						</div>
+						<hr class="separator-line">
+						<!-- Number of units -->
+						<div class="control-group">
+							<label class="control-label" for="num_products">Number of products to create</label>
+							<div class="controls">
+								<input type="text" name="num_products" id="num_products" value="1" required="True" pattern="[0-9]*"></input>
+								<p class="help-block">Number of product pages to create, and number of QR codes to print out.</p>
+							</div>
+						</div>
+						<hr class="separator-line">
+						<!-- Submit -->
+						<div class="pull-right">
+							<button type="submit" class="btn btn-primary">Create</button>
+							<a href="/view?id={{id}}"><button type="cancel" class="btn">Cancel</button></a>	
+						</div>
+						</fieldset>			
+					</form>
+				</div>
+			</div>
+			{% include "footer.html" %}
+		</div>
+  	</body>
+</html>

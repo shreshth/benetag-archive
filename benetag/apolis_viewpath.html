@@ -1,0 +1,184 @@
+    <!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% include "apolis_styles.html" %}
+        <title>{{name}}</title>
+          
+        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+        <script type="text/javascript" src="scripts/distance.js"></script>
+        <script type="text/javascript">
+            function initialize() { 
+                var userLat = null;
+                var userLong = null;
+                var userAddress = "";
+                if (navigator.geolocation) // check if browser support this feature or not
+                {
+                    navigator.geolocation.getCurrentPosition(function(position)
+                                                             {
+                                                             userLat = position.coords.latitude;
+                                                             userLong = position.coords.longitude;
+                                                             geocoder = new google.maps.Geocoder();
+                                                             
+                                                             var latlng = new google.maps.LatLng(userLat, userLong);
+                                                             geocoder.geocode({'latLng': latlng}, function(results, status) {
+                                                             	if (status == google.maps.GeocoderStatus.OK) {
+																	if (results[1]) {
+																	 //formatted address
+																	userAddress=results[results.length-4].formatted_address;
+																	document.getElementById('userAddress').innerHTML = 'at '+ userAddress;
+																	}
+																}
+															});
+        
+                                                            var num_locations = {{locations|length}};
+															var prevLocation = null;
+															var innerHTML = "";
+															var interdistance = 0.0;
+															
+															var totalDistance = 0.0
+															var factor = 120;
+															
+															// calculate total distance
+															{% for location in locations %}
+															    {% if forloop.counter > 1 %}
+															        interDistance = getDistance(prevLocation[0],prevLocation[1],{{location.location}});
+															        totalDistance += interDistance;
+															    {% endif %}
+															    prevLocation = "{{location.location}}".split(",");
+															{% endfor %}
+															
+															// add locations to path
+															{% for location in locations %}
+																{%if forloop.counter == 1%}
+																	innerHTML = '<a href = "/apolis_viewlocation?id={{location.key}}"><p name="locationname" class="info center">{{location.name}}</p><p class="sub center">{{location.address}}</p></a>';
+																{%else%}
+																	interDistance = getDistance(prevLocation[0],prevLocation[1],{{location.location}});
+																	
+																	var dist = interDistance.toFixed(1);
+                                                                    var logdist = dist*factor/totalDistance;
+                                                                    if (logdist < 20) logdist = 13;
+                                                                    innerHTML += '<hr class="vertical-line top" style="height:' + logdist+'px;"><p class="dist">'+dist+' mi</p> <hr class="vertical-line bottom" style="height:' + logdist+'px;"><a href = "/viewlocation?id={{location.key}}"><p name="locationname" class="info center">{{location.name}}</p><p class="sub center">{{location.address}}</p></a>';
+																{%endif%}
+																prevLocation = "{{location.location}}".split(",");
+															{% endfor %}
+															
+															// if user location available add last line of path, and total travel dist to you
+															if (userLat != null) {
+																interDistance = getDistance(prevLocation[0],prevLocation[1],userLat,userLong);
+																totalDistance += interDistance;
+																var dist = interDistance.toFixed(1);
+																var logdist = dist*factor/totalDistance;
+                                                                if (logdist < 20) logdist = 13;
+																innerHTML += '<hr class="vertical-line top" style="height:' + logdist+'px;"><p class="dist">'+dist+' mi</p> <hr class="vertical-line bottom" style="height:' + logdist+'px;"><p name="locationname" class="info center">You</p>';
+											                    
+																document.getElementById('location-table').innerHTML = '<hr class="separator-line"><table><td><div id="distance-div"> <p class="distance-value">' + totalDistance.toFixed(1) + ' mi </p> <p class="away"> travelled</p></div></td> <td id="info" class = "spaced"> Total distance travelled by this {{name}} to get to where you are. </td></table>';
+																
+															}
+               													document.getElementById('path').innerHTML = innerHTML; 
+                                                            }, 
+                                                            
+                                                            // if location not available
+                                                            function(error)
+                                                            {
+																var num_locations = {{locations|length}};
+																var totalDistance = 0.0;
+																var prevLocation = null;
+																var innerHTML = "";
+																var interDistance = 0.0;
+																var factor = 120;
+																
+                                                                // calculate total distance
+                                                                {% for location in locations %}
+                                                                    {% if forloop.counter > 1 %}
+                                                                        interDistance = getDistance(prevLocation[0],prevLocation[1],{{location.location}});
+                                                                        totalDistance += interDistance;
+                                                                    {% endif %}
+                                                                    prevLocation = "{{location.location}}".split(",");
+                                                                {% endfor %}
+																
+																// add locations to path
+																{% for location in locations %}
+																	{%if forloop.counter == 1%}
+																		innerHTML = '<a href = "/apolis_viewlocation?id={{location.key}}"><p name="locationname" class="info center">{{location.name}}</p><p class="sub center">{{location.address}}</p></a>';
+																	{%else%}
+																		interDistance = getDistance(prevLocation[0],prevLocation[1],{{location.location}});
+																		
+																		var dist = interDistance.toFixed(1);
+																	    var logdist = dist*factor/totalDistance;
+                                                                        if (logdist < 20) logdist = 13;
+																		innerHTML += '<hr class="vertical-line top" style="height:' + logdist+'px;"><p class="dist">'+dist+' mi</p> <hr class="vertical-line bottom" style="height:' + logdist+'px;"><a href = "/viewlocation?id={{location.key}}"><p name="locationname" class="info center">{{location.name}}</p><p class="sub center">{{location.address}}</p></a>';
+																	{%endif%}
+																	prevLocation = "{{location.location}}".split(",");
+																{% endfor %}
+																
+																document.getElementById('path').innerHTML = innerHTML;
+																
+																});
+				}
+                
+                else {
+                    var num_locations = {{locations|length}};
+                	var totalDistance = 0.0;
+                	var prevLocation = null;
+					var innerHTML = "";
+					var interDistance = 0.0;
+					var factor = 120;
+					
+					// calculate total distance
+                    {% for location in locations %}
+                        {% if forloop.counter > 1 %}
+                            interDistance = getDistance(prevLocation[0],prevLocation[1],{{location.location}});
+                            totalDistance += interDistance;
+                        {% endif %}
+                        prevLocation = "{{location.location}}".split(",");
+                    {% endfor %}
+					
+					//make the html
+					{% for location in locations %}
+                        {%if forloop.counter == 1%}
+                            innerHTML ='<a href = "/viewlocation?id={{location.key}}"><p name="locationname" class="info center">{{location.name}}</p><p class="sub center">{{location.address}}</p></a>';
+                        {%else%}
+                            interDistance = getDistance(prevLocation[0],prevLocation[1],{{location.location}});
+                            
+                            var dist = interDistance.toFixed(1);
+                            var logdist = dist*factor/totalDistance;
+                            if (logdist < 20) logdist = 13;
+                            innerHTML += '<hr class="vertical-line top" style="height:' + logdist+'px;"><p class="dist">'+dist+' mi</p> <hr class="vertical-line bottom" style="height:' + logdist+'px;"><a href = "/viewlocation?id={{location.key}}"><p name="locationname" class="info center">{{location.name}}</p><p class="sub center">{{location.address}}</p></a>';
+                        {%endif%}
+                        prevLocation = "{{location.location}}".split(",");
+                    {% endfor %}
+					
+					document.getElementById('path').innerHTML = innerHTML; 
+                }
+            }
+        </script>
+        
+    </head>
+        
+    <body onload="initialize()">
+    
+    	<div class = "container">
+			{% include "apolis_navbar.html" %}
+			
+			<hr class="space">
+			
+			<div class="row">
+				<div class="span8">
+					<p class="producer-name"><a href="/viewproducer?id={{producer.key}}">{{producer.name}}</a></p>
+					<p class="product-name"> Path for {{name}} </p>
+					<p class="section-heading top-padded"> 
+						{{name}} goes through <b>{{numloc}}</b> location{% if numloc > 1 %}s{% endif %}{% if numloc == 0 %}s{% endif %} before it gets to you. 
+					</p>
+					
+					<hr class="top-line spaced">
+					<div id="path"></div>		
+					<p id="userAddress" class="center"></p>
+					
+					<div id="location-table"></div>		
+					
+				</div>
+			</div>
+			{% include "apolis_footer.html" %}
+    	</div>
+    </body>
+    </html>

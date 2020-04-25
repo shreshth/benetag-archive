@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag - Edit your profile</title>
+		
+		<!-- Image upload and cropping script -->
+		<script type="text/javascript">
+			{% if cropentity.hasImage %}
+				var hasImage=true;
+			{% else %}
+				var hasImage=false;
+			{% endif %}
+		</script>
+		<script type="text/javascript" src="scripts/benetagimgcropedit.js"></script>
+		
+	</head>
+
+	<body onload="initializecrop();">
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr id="space">
+			<div class="row">
+				<div class="span8">
+					<form onsubmit="finishcrop();" action="/storeeditedconsumer" enctype="multipart/form-data" method="post" class="form-horizontal">
+						<fieldset>
+						<legend>Edit your profile</legend>
+						<hr id="separator-line">
+						<!-- Name -->
+						<div class="control-group">
+							<label class="control-label" for="name">Name</label>
+							<div class="controls">
+								<input name="name" id="name" value="{{name_old}}" required="True"></input>
+							</div>
+					 	</div>
+						<hr id="separator-line">
+						<!-- Email -->
+						<div class="control-group">
+							<label class="control-label" for="email">Public email</label>
+							<div class="controls">
+								<input name="email" id="email" value="{{email_public_old}}" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}"></input>
+								<p class="help-block">This email address will be publicly visible. Leave blank if you don't want to show a public email</p>
+								<!--<a rel="popover" data-content="Your publicly visible email address. Leave blank if you don't want to show a public email"> [?] </a>-->
+							</div>
+						</div>
+						<hr id="separator-line">
+						<!-- Profile -->
+						<div class="control-group">
+							<label class="control-label" for="profile">Profile</label>
+							<div class="controls">
+								<textarea name="profile" id="profile" rows="6">{{profile_old}}</textarea>
+								<p class="help-block">Something about yourself</p>
+								<!--<a rel="popover" data-content="Something about yourself"> [?] </a>-->
+							</div>
+						</div>
+						<hr id="separator-line">
+						<!-- Picture -->
+						<!-- cropping modal -->
+						<div class="modal hide fade" id="myModal">
+							<div class="modal-header">
+								<h3>Crop image</h3>
+							</div>
+							<div class="modal-body">
+								<img id="img_crop" name="img_crop"></img>
+							</div>
+							<div class="modal-footer">
+								<button class="btn" data-dismiss="modal">Save</button>
+							</div>
+						</div>
+						
+						<div class="hidden-desktop">
+							<div class="alert">
+                                Unfortunately you can only add a picture from a desktop machine.
+                            </div>
+						</div>
+						<div class="control-group hidden-phone">
+							<label class="control-label" for="picture">Picture</label>
+							<div class="controls">
+								<div name="file_div" id="file_div">
+									<input type="file" id="files" name="files[]" accept="image/*" />
+								</div>
+								<img class="hidden" id="preview" name="preview"></img> <!-- copy of image -->
+								<div class="top-padded">
+								{% if cropentity.hasImage %}
+									<img class="previewthumb" id= "old_img" name="old_img" src="/consumerimage?id={{id}}"></img>
+								{% else %}
+									<img class="hidden" id="old_img" name="old_img"></img> <!-- old image -->
+								{% endif %}
+								</div>
+								<canvas class="hidden" id="canvas" name="canvas" width="150" height="150"></canvas> <!-- preview canvas for cropping -->
+								<canvas class="hidden" id="canvashidden" name="canvashidden" width="150" height="150"></canvas> <!-- hidden canvas for cropping data -->
+								<textarea class="hidden" id="picturedata" name="picturedata"></textarea> <!-- actual return box -->
+								<div id="error_txt"></div> <!-- errors, if any -->
+								<a class="hidden" data-toggle="modal" href="#myModal" id="modal_trigger"></a> <!-- hidden modal trigger -->
+								<!-- delete and crop buttons -->
+								<button class="btn btn-danger hidden" id="delete" name="delete" onclick="refresh(); return false;">Delete</button>
+								<button class="btn hidden" id="crop_btn" name="crop_btn" onclick="forceCrop(); return false;">Crop</button>
+								<p class="help-block">Your profile picture (Max size: 512 kB) </p>
+							</div>		
+						</div>
+						<hr id="separator-line">
+						<!-- Submit -->
+						<div class="pull-right">
+							<button type="submit" class="btn btn-primary">Save</button>	
+							<a href="/myprofile"><button type="cancel" class="btn">Cancel</button></a>
+						</div>
+						</fieldset>			
+					</form>
+				</div>
+			</div>
+		  	{% include "footer.html" %}
+		</div>
+  	</body>
+</html>

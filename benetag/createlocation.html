@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag - Create location</title>
+		
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+		
+		<script>
+		    var map;
+		    var marker;
+		    function initialize() {
+		        var latlng = new google.maps.LatLng(39.095963, -102.744141);
+		        var myOptions = {
+		            zoom: 2,
+		            center: latlng,
+		            mapTypeId: google.maps.MapTypeId.ROADMAP
+		        };
+		        map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+		        google.maps.event.addListener(map, 'click', function(event) {
+		            if (!marker) {
+		                marker = new google.maps.Marker({
+		                    map: map,
+		                    position: event.latLng
+		                });
+		            } else {
+		                marker.setPosition(event.latLng);
+		            }
+		            changeInput();
+		        });
+		    }
+
+		    function address_change() {
+		        var address = $('#address').val();
+		        geocoder = new google.maps.Geocoder();
+		        geocoder.geocode( { 'address': address}, function(results, status) {
+		            if (status == google.maps.GeocoderStatus.OK) {
+		                map.setCenter(results[0].geometry.location);
+				if (marker) {
+				    marker.setPosition(results[0].geometry.location);
+				} else {
+		                    marker = new google.maps.Marker({
+		                        map: map,
+		                        position: results[0].geometry.location
+		                    });
+				}
+		                map.setZoom(9);
+		                changeInput();
+		            } else {
+		            }
+		        });
+		    }
+		
+		    function changeInput() {
+		        var lat = marker.getPosition().lat();
+		        var lng = marker.getPosition().lng();
+		        $('#location').val(lat+','+lng);
+		    }
+		</script>
+
+		<!-- Script to differentiate two submits -->
+		<script type="text/javascript">
+		function onsubmitform()
+		{
+		  if(document.pressed == 'more')
+		  {
+		   document.createfact.action ="/storelocation?more=True";
+		  }
+		  else
+		  if(document.pressed == 'exit')
+		  {
+		    document.createfact.action ="/storelocation";
+		  }
+		  return true;
+		}
+		</script>
+
+		<!-- Script if its a popup window -->
+		<script>
+		function storepopupworker() {
+			document.createfact.action="/storelocation?popupworker=True";
+		}
+		function storepopupproduct() {
+			document.createfact.action="/storelocation?popupproduct=True";
+		}
+		
+		</script>
+		
+		<!-- Image upload and cropping script -->
+		<script type="text/javascript" src="scripts/benetagimgcropcreate.js"></script>
+
+	</head>
+
+	<body onload="initialize(); initializecrop();">
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+
+			<div class="row">
+				<div class="span8">
+			
+					<form name="createfact" onsubmit="finishcrop(); return onsubmitform();" enctype="multipart/form-data" method="post" class="form-horizontal">	
+						<fieldset>
+						<legend>Create a location</legend>
+
+	  					{% if added %}
+						<div class="top-padded">
+							<div class="alert alert-success">Location added successfully</div>
+						</div>
+	  					{% endif %}
+					  	{% if repeatname %}
+						<div class="top-padded">
+							<div class="alert alert-danger">Location with this name already exists. If you want to create a new location with the same name, please add a unique ID.</div>
+						</div>
+						{% endif %}
+						{% if repeatid %}
+						<div class="top-padded">
+							<div class="alert alert-danger">Location with this unique ID already exists. Please add a unique ID.</div>
+						<div class="top-padded">
+						{% endif %}
+
+						<!-- Name -->
+						<div class="control-group">
+							<label class="control-label" for="name">Location name</label>
+							<div class="controls">
+								<input name="name" id="name" required="True"></input>
+							</div>
+						</div>
+						<!-- Address -->
+						<div class="control-group">
+							<label class="control-label" for="address">Address</label>
+							<div class="controls">
+								<input required="True" id="address" onkeypress="address_change()" onchange="address_change()" name="address"></input>
+								<!--<a rel="popover" data-content="Address of the location"> [?] </a>-->
+							</div>		
+						</div>
+						<!-- Description -->
+						<div class="control-group">
+							<label class="control-label" for="description">Description</label>
+							<div class="controls">
+								<textarea id="description" name="description" rows="8"></textarea>
+								<p class="help-block">Tell us something about the place</p>
+								<!--<a rel="popover" data-content="Something about the place"> [?] </a>-->
+							</div>		
+						</div>
+						<!-- Picture -->
+						<!-- cropping modal -->
+						<div class="modal hide fade" id="myModal">
+							<div class="modal-header">
+								<h3>Crop image</h3>
+							</div>
+							<div class="modal-body">
+								<img id="img_crop" name="img_crop"></img>
+							</div>
+							<div class="modal-footer">
+								<button class="btn" data-dismiss="modal">Save</button>
+							</div>
+						</div>
+						
+						<!-- hidden phone -->
+					    <div class="hidden-desktop">
+							<div class="alert">
+                                Unfortunately you can only add a picture from a desktop machine.
+                            </div>
+						</div>
+					    <div class="control-group visible-desktop">
+							<label class="control-label" for="picture">Picture</label>
+							<div class="controls">
+								<div name="file_div" id="file_div">
+									<input type="file" id="files" name="files[]" accept="image/*" />
+								</div>
+								<img class="hidden" id="preview" name="preview"></img> <!-- copy of image -->
+								<canvas class="hidden" id="canvas" name="canvas" width="150" height="150"></canvas> <!-- preview canvas for cropping -->
+								<canvas class="hidden" id="canvashidden" name="canvashidden" width="150" height="150"></canvas> <!-- hidden canvas for cropping data -->
+								<textarea class="hidden" id="picturedata" name="picturedata"></textarea> <!-- actual return box -->
+								<div id="error_txt"></div> <!-- errors, if any -->
+								<a class="hidden" data-toggle="modal" href="#myModal" id="modal_trigger"></a> <!-- hidden modal trigger -->
+								<!-- delete and crop buttons -->
+								<button class="btn btn-danger hidden" id="delete" name="delete" onclick="refresh(); return false;">Delete</button>
+								<button class="btn hidden" id="crop_btn" name="crop_btn" onclick="forceCrop(); return false;">Crop</button>
+								<p class="help-block">A picture of the place (Max size: 512 kB) </p>
+							</div>		
+						</div>
+						<!-- Unique ID -->
+						<div class="control-group">
+							<label class="control-label" for="unique">Unique ID</label>
+							<div class="controls">
+								<input id="unique" name="unique"></input>
+								<p class="help-block">An optional unique ID to identify this location. This will be useful (and necessary) if you have multiple locations with the same name</p>
+								<!--<a rel="popover" data-content="An optional unique ID to identify this location. This will be useful (and necessary) if you have multiple locations with the same name"> [?] </a>-->
+							</div>		
+						</div>
+						<hr class="separator-line">
+						<!-- Submit -->
+						{% if popupworker %}
+						<div class="pull-right">
+							<button type="submit" class="btn btn-primary" name="save" onclick="storepopupworker()">Save and close</button>
+							<button type="submit" class="btn" name="close" onclick="window.close()">Cancel</button>
+						</div>
+						{% endif %}
+						{% if popupproduct %}
+						<div class="pull-right">
+							<button type="submit" class="btn btn-primary" name="save" onclick="storepopupproduct()">Save and close</button>
+							<button type="submit" class="btn" name="close" onclick="window.close()">Cancel</button>
+						</div>
+						{% endif %}
+						{% if not popupworker and not popupproduct %}
+						<div class="pull-right">
+							<button type="submit" class="btn btn-primary" name="more" onclick="document.pressed=this.name">Save and create another</button>
+							<button type="submit" class="btn btn-primary" name="exit" onclick="document.pressed=this.name">Save and view location</button>
+							<a href="/" onclick="history.back(); return false;"><button type="cancel" class="btn">Cancel</button></a>
+						</div>
+						{% endif %}			
+						<!-- Location hidden field -->
+						<input id="location" name="location" type="hidden"></input><br>
+						</fieldset>
+					</form>
+				</div>
+			<!-- Map -->
+			<div class="span4">
+			<div id="map_canvas" class="hidden-phone"></div>
+			</div>
+	
+			</div>
+
+			{% include "footer.html" %}
+		</div>  
+  	</body>
+</html>

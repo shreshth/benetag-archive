@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+		
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    	
+    	<script type="text/javascript">
+			function initialize() {
+				{% if latitude and longitude %}
+					var latlng = new google.maps.LatLng({{latitude}}, {{longitude}});
+					var myOptions = {
+						zoom: 8,
+						center: latlng,
+						mapTypeId: google.maps.MapTypeId.ROADMAP
+					};
+					var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+					document.getElementById("map_canvas").style.position="fixed";
+					var marker = new google.maps.Marker({
+						position: latlng,
+						map: map,
+					});
+				{% endif %}
+			}
+		</script>
+	</head>
+	
+	<body onload="initialize()">
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			<hr class="space">
+			
+			<div class="row">
+				<div class="span12">	
+					<!-- heading --->
+					<p class="producer-name"><a href="/viewproducer?id={{producer.key}}">{{producer.name}}</a></p>
+					<p class="product-name"> Workers for <a href="/view?id={{productconfig.key}}">{{productconfig.name}}</a> </p>
+					<p class="section-heading top-padded"> See the stories about the people that made {{productconfig.name}} </p>
+				
+					<hr class="top-line spaced">
+				</div>
+			</div>
+			<div class="row">
+				<!-- workers -->
+				{% for worker in workers %}
+				<div class="span4">
+					<table class="searchtable">
+						<tr>
+							<!-- image + buttons -->
+							<td class="searchtable img-large">
+								<ul class="thumbnails">
+									<li class="searchthumb-large">
+									<a href="/viewworker?id={{worker.key}}" class="thumbnail">
+										<img src="workerimage?id={{worker.key}}"></img>
+									</a>
+									</li>
+								</ul>
+							</td>
+							<!-- info -->
+							<td class = "searchtable info" >
+								<p class="search"><a href="/viewworker?id={{worker.key}}">{{worker.name}}</a></p>
+								<p class="search sub">{{worker.shortDescription}}</p>
+							</td>
+						</tr>
+					</table>
+				</div>
+				{% empty %}
+					<div class="alert">
+						{% if can_edit_local %} <h4 class="alert-heading">Go ahead, add some workers to this product!</h4>
+						{% else %} <h4 class="alert-heading">Whoa!</h4> Looks like they haven't added any workers to this product yet yet!
+						{% endif %}
+					</div>
+				{% endfor %}
+			</div>
+			
+			{% include "footer.html" %}
+		
+		</div>
+	</body>
+</html>

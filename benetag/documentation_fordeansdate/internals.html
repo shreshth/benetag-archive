@@ -1,0 +1,127 @@
+<html>
+<head>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="stylesheets/benetag-bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="stylesheets/mobilepage.css" />
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css"/>
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet" type="text/css"/>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+
+<script type="text/javascript" src="stylesheets/js/bootstrap-collapse.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-alert.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-transition.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-dropdown.js"></script>
+<script type="text/javascript" src="scripts/benetagalert.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-tooltip.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-popover.js"></script>
+<script type="text/javascript" src="stylesheets/js/bootstrap-modal.js"></script>
+		
+		<title>BeneTag</title>
+  </head>
+
+<body>
+	<div class="container">
+		<p class="logo"> <a href="./">Bene<strong>Tag</strong></a></p>
+		<hr class="top-line spaced">
+	
+		<h1 class = "all-padded">Internals </h1>
+		
+		<p class="info all-padded b"> Model </p>
+		
+		<p class = "all-padded">
+			Our web application is hosted on <a href="https://developers.google.com/appengine/">Google App Engine</a>, and the code-base is hosted on a private Git repository on BitBucket.  
+			Google App Engine can also be run on a local machine, by obtaining Google's App Engine Launcher, which is available for various platforms. Our team was working on the code on Windows, Macs and 
+			Linux Machines, and testing additionally on iOS, Windows Phone and Android Devices. App Engine Launcher allows each team member to deploy to the server if needed, but also maintain a data store on localhost
+			for testing. 
+			
+			<br><br>
+			We used the Django framework in conjunction with HTML5 and CSS3, 
+			to create a model-view-controller (MVC) architecture.  Our model is based in Google App Engine's NoSQL Key-Value store. We access it through the Python based Django Framework.  
+			Django itself forms the controller in our architecture and it the way in which the front-end view interacts with the App Engine data store. 
+			Our view is created in HTML5 and CSS3, using a variety of third party tools and libraries that we modify extensively to fit the needs of BeneTag. 
+		</p>
+		
+		<p class = "all-padded">
+			BeneTag is divided into a consumer interface and a producer interface.  Both consumers and producers are signed in using Google's authentication service.  
+			Consumers are able to view product pages (ideally by scanning QR codes on products in the market), add items to their closet, share product pages on social networks, 
+			leave reviews and ratings, and receive messages from producers.  Consumers are not allowed to modify the product pages themselves.  
+			
+			Producers are allowed to create and edit their own product pages once they have been manually verified.  
+			Product pages include a description and picture and contain additional widgets like locations and workers.  Producers are also able to send messages to all owners of an item, 
+			and the message goes to the consumer's BeneTag inbox which will prevent email spamming.
+		</p>
+		
+		<p class="info all-padded b"> Code Structure </p>
+		<p class = "all-padded">
+		
+		In the root folder are all the *.html files, and their *.py backends used for Django's dynamic page generation based on data from the App Engine Data Store. 
+		There are three main kinds of pages. All pages of the format view*.html are pages that display information about products, locations, workers, users or other features such as the closet.
+		All create*.html pages are forms used to create entities in the App Engine data store, and are for the most part restricted to the Producer End of the website. This holds true for edit*.html pages, which edit existing entries in the App Engine Datastore.
+		
+		<br><br>
+		
+		Additionally we have utility *.html files that are included in other *.html files using Django's {% include %} tag to allow for modularity and convenience.
+		These include, among others, header.html, footer.html, navbar.html, styles.html, scripts.html and search.html.
+		Other miscellaneous pages include pages for search results, the home pages for consumers, producers and people who are not logged in. 
+		
+		<br><br>
+		
+		Two key files are app.yaml and entities.py. Entities.py lays out the entire object model, and contains extremely useful utility functions called throughout the code.
+		app.yaml stores the handlers for all the urls so that they can be served to the python backends to get template values using Django's template interface. 
+		
+		<br><br>
+		
+		Default images, scripts and stylesheets are stored /img, /scripts and /stylesheets respectively. 
+		
+		</p>
+		
+		<p class="info all-padded b"> CSS Framework </p>
+		<p class = "all-padded">The front-end user interface (UI) was implemented primarily with <a href="https://github.com/twitter/bootstrap">Bootstrap and Less</a>.  
+			Bootstrap is a library of Javascript (JS) and CSS UI elements that is maintained by Twitter.  Less is the CSS preprocessor that powers Bootstrap.  The primary advantage of 
+			Bootstrap is that the features in its library are compatible across all browsers types.  Furthermore, widgets like buttons, drop-down menus, and navigation bars adapt well 
+			to both mobile-based browsers and computer-based browsers.  This allowed us to create singular BeneTag pages, rather than creating a separate mobile version for each page.
+		</p>
+		
+		<p class = "all-padded">
+			While Bootstrap served as a useful starting point for our UI implementation, our visual identity diverged significantly from the default Bootstrap interface. 
+			We created a unique BeneTag identity through typography and extensive styling. The focus has been to make this visual identity unique and cross-platform compatible. 
+		</p>
+		
+		<p class = "all-padded">
+			We chose to use a custom font called Droid Sans from the Google Web Fonts collection.  Droid Sans is licensed under Apache licence version 2.0,
+			which allows for free use and modification of the font.  Google Web Fonts allows the font to be dynamically loaded by the browser even if the font 
+			is not installed on the user's computer.  
+		</p>
+		
+		<p class = "all-padded">
+			Next, we created a customized Bootstrap version by modifying the underlying Less code.  This Less code and a compiled benetag-bootstrap.css is available in /stylesheets.
+            Our CSS framework, is completed with a custom CSS file, currently called mobilepage.css. This defines styles 
+			outside of the Bootstrap library to allow for customization without changing too much of the Bootstrap library. Creating this dichotomy gives us the ability to harness the power of Bootstrap and its built in components
+			as well as the flexibility of directly editing CSS. Therefore we can make quick changes to formatting without recompiling Bootstrap's Less backend into CSS every time we make a change. 
+			However, when and if changes must be made to styles that encompass the entire website, we can change variables in Bootstrap's Less files to quickly make design iterations across the website.
+		</p>
+		
+		<p class="info all-padded b"> Value Adding Features </p>
+		<p class = "all-padded">
+			For each product, we provided an automatic link to the Amazon price quote whenever possible.  To implement the back-end functionality for this feature, 
+			we used <a href="https://github.com/dlo/bottlenose">Bottlenose</a>, Python-based wrapper for Amazon's Product Advertising API.  After a fair amount of tweaking, 
+			we were able to search for products by keyword and return the price and link. The source for bottlenose is also copied in /dlo-bottlenose*. This feature ended up being much more difficult than expected - many different 3rd party 
+			API wrapper programs simply didn't work.  Even with Bottlenose, our Amazon search capabilities were limited by some arbitrary-seeming constraints.
+		</p>
+		
+		<p class = "all-padded">
+			Certain features were created entirely from scratch: the drag and drop of the locations using HTML5, and the product path which is dynamically 
+			generated using CSS and JavaScript. 
+		</p>
+		
+		<p class = "all-padded">
+			Other front end features use JavaScript and JQuery to implement an overall feature-rich application. We use the Google Maps API for mapping services 
+			(used extensively as we focus on locations), and the JCrop library to allow rich interaction with photos uploaded by users. 
+			<br><br>
+			The source for JCrop is available in /stylesheets/jcrop.
+		</p>
+		
+    </div>
+</body>
+</html>

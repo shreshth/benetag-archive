@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+		<script type="text/javascript">
+			  function validateForm()
+			  {
+				  var x=document.forms["search"]["query"].value;
+				  if (x==null || x=="")
+				  {
+					  insertAlertMarkup('alert', 'Come on, help a bot out! Tell me what to search for.', 'warning');
+					  return false;
+				  }
+			  }
+    	</script>  
+	</head>
+	<body>
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+			
+			<div class="row">
+			
+				<div class="span2">
+					<p class="logo small hidden-phone"> <a href="./">Bene<strong>Tag</strong></a></p>
+				</div>
+				
+				<div class="span6">	
+					<form name="search" class="form-inline center" action="/productsearchresult" method="post" onsubmit="return validateForm()">
+						<div class="input-append">
+							<input name="query" id="appendedInputButton" class="span5 search-query" type="text" value="{{query}}"><button class="btn btn-search" type="submit"><i class="icon-search"></i></button>
+						</div>
+					</form>
+				</div>
+			
+			</div>
+			
+			<hr class="top-line spaced">
+			
+			<div class="row">
+				
+				<div class = "span12">
+					
+					<p class = "section-heading">Results for <strong>{{query}}</strong>:</p>
+					
+					{% if allListEmpty %}
+					<div class="alert alert-block">
+							<h4 class="alert-heading">Oops!</h4>
+					  		No results for that query yet!
+						</div>
+					{% endif %}
+					
+					<!-- product search results section-->
+					{% if matchesProduct %}
+						
+						<p class = "section-heading"> Products: </p>
+						
+						<table class="searchtable">
+                            
+                            {% for p in matchesProduct %}    
+                            <tr>
+                            
+                                <!-- image -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/view?id={{p.key}}" class="thumbnail">
+                                            <img src="productimage?id={{p.key}}"></img>
+                                        </a>
+                                        <li>
+                                    </ul>
+                                </td>
+                                
+                                <!-- info -->
+                                <td class = "searchtable info" >
+                                     <p class="search"><a href="/view?id={{p.key}}">{{p.name}}</a></p>
+									 <p class="search sub">by <a href="/viewproducer?id={{p.getProducer.key}}">{{p.getProducer.name}}</a></p>
+                                     <p class="search sub">{{p.shortDescription}}</p>
+                                </td>
+                            
+                            </tr>
+                            {% endfor %}           
+						</table>        
+						<hr class = "separator-line">
+						
+					{% endif %}
+					
+                    <!-- producer search results section-->
+					{% if matchesProducer %}
+												
+						<p class = "section-heading"> Producers: </p>
+						
+						<table class="searchtable">
+                            {% for p in matchesProducer %}    
+                            <tr>
+                            
+                                <!-- image -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/viewproducer?id={{p.key}}" class="thumbnail">
+                                            <img src="producerimage?id={{p.key}}"></img>
+                                        </a>
+                                        <li>
+                                    </ul>
+                                </td>
+                                
+                                <!-- info -->
+                                <td class="searchtable info">
+                                    <p class="search"><a href="/viewproducer?id={{p.key}}">{{p.name}}</a></p>
+                                    <p class="search sub">{{p.shortDescription}}</p>
+                                </td>
+                            
+                            </tr>
+                            {% endfor %}           
+						</table>     
+						<hr class = "separator-line">
+						
+					{% endif %}
+			
+			        <!-- worker search results section-->
+					{% if matchesWorker %}
+												
+						<p class = "section-heading"> Workers: </p>
+						
+						<table class="searchtable">
+                            {% for p in matchesWorker %}    
+                            <tr>
+                            
+                                <!-- image -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/viewworker?id={{p.key}}" class="thumbnail">
+                                            <img src="workerimage?id={{p.key}}"></img>
+                                        </a>
+                                        <li>
+                                    </ul>
+                                </td>
+                                
+                                <!-- info -->
+                                <td class="searchtable info">
+                                     <p class = "search"><a href="/viewworker?id={{p.key}}">{{p.name}}</a></p>
+                                     <p class="search sub"><a href="/viewproducer?id={{p.getProducer.key}}">{{p.getProducer.name}}</a></p>
+                                     <p class="search sub"><a href="/viewlocation?id={{p.getLocation.key}}">{{p.getLocation.name}}</a></p>
+                                </td>
+                            
+                            </tr>
+                            {% endfor %}           
+						</table>        
+						<hr class = "separator-line">
+						
+					{% endif %}
+					
+					<!-- location search results section-->
+					{% if matchesLocation %}
+												
+						<p class = "section-heading"> Locations: </p>
+						
+						<table class="searchtable">
+                            {% for p in matchesLocation %}    
+                            <tr>
+                            
+                                <!-- image -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/viewlocation?id={{p.key}}" class="thumbnail">
+                                            <img src="locationimage?id={{p.key}}"></img>
+                                        </a>
+                                        <li>
+                                    </ul>
+                                </td>
+                                
+                                <!-- info -->
+                                <td class="searchtable info">
+                                    <p class = "search"><a href="/viewlocation?id={{p.key}}">{{p.name}}</a></p>
+									<p class="search sub"><a href="/viewproducer?id={{p.getProducer.key}}">{{p.getProducer.name}}</a></p>
+                                    <p class="search sub">{{p.address}}</p>
+                                </td>
+                            
+                            </tr>
+                            {% endfor %}           
+						</table>        
+						
+						<hr class = "separator-line">
+					{% endif %}
+					
+				</div>
+				
+				{% include "footer.html" %}
+			
+			</div>
+		</div>
+	</body>
+</html>

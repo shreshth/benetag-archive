@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+	{% include "styles.html" %}
+    <title>BeneTag</title>
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript">
+          function validateForm()
+          {
+              var x=document.forms["search"]["query"].value;
+              if (x==null || x=="")
+              {
+                  insertAlertMarkup('alert', 'Come on, help a bot out! Tell me what to search for.', 'warning');
+                  return false;
+              }
+          }
+    </script>  
+  </head>
+  <body>
+	
+			<div class="container">
+			
+			{% include "navbar.html" %}
+    		{% include "headerlogo.html" %}
+			
+			{% if firsttime %}
+			<div class="row">
+			<div class="span6 offset3">
+			<div class="alert span5">
+					<button class="close" data-dismiss="alert">x</button>
+					<strong>Thank you for joining BeneTag</strong>. Be sure to look at our
+					<a href="/consumertutorial">tutorial for consumers</a> to get you started.
+			</div>
+			</div>
+			</div>
+			{% endif %}
+			
+			{% include "search.html" %}
+			
+			<div class="row">
+				<div class="span6 offset3 top-padded">
+					<p> <strong> Welcome to BeneTag</strong> 
+					<br> 
+					BeneTag is a product network. Search for products, or scan a QR code from your phone. You can go to product pages and find information about how a product 
+					was made, who made it and how it got to you. Add products you own to your closet, and producers can send updates to your inbox. 
+					</p>			
+				</div>
+			</div>
+			
+			{% include "footer.html" %}
+		
+		</div>
+
+	</body>
+</html>

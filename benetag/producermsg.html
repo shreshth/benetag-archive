@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag - Send message</title>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+	    	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	</head>
+
+	<body>
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+
+			<div class="row">
+				<div class="span8">
+			
+					<form action="/producersendmsg?id={{id}}" enctype="multipart/form-data" method="post" class="form-horizontal">	
+						<fieldset>
+						<legend>Send a message</legend>
+
+						<!-- Receiver -->
+						<div class="control-group">
+							<label class="control-label" for="name">To</label>
+							<div class="controls">
+								<p>People who own <a href="/view?id={{line.key}}">{{name}}</a> {% if is_config %} (<a href="/view?id={{config.key}}">{{config.config_name}}</a>) {% else %} (<a href="/view?id={{line.key}}">all configs</a>) {% endif %} </p>
+								<p class="help-block">This will be sent to the {{num_sent}} people who have {{name}} in their closets</p>
+							</div>
+						</div>
+						<!-- Text -->
+						<div class="control-group">
+							<label class="control-label" for="text">Message</label>
+							<div class="controls">
+								<textarea id="text" class="span6" name="text" rows="8"></textarea>
+								<!--<a rel="popover" data-content="Something about the place"> [?] </a>-->
+							</div>		
+						</div>
+						<!-- Submit -->
+						<div class="pull-right">
+							<button type="submit" class="btn btn-primary">Send</button>
+							<a href="/"><button type="cancel" class="btn">Cancel</button></a>		
+						</div>
+						<!-- Location hidden field -->
+						<input id="location" name="location" type="hidden"></input><br />
+						</fieldset>
+					</form>
+				</div>	
+			</div>
+
+			{% include "footer.html" %}
+		</div>  
+  	</body>
+</html>

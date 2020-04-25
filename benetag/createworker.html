@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag - Create worker profile</title>
+
+		<!-- Script for disambiguating between two submits -->
+		<script type="text/javascript">
+		function onsubmitform()
+		{
+		  if(document.pressed == 'more')
+		  {
+		   document.creatework.action ="/storeworker?more=True";
+		  }
+		  else
+		  if(document.pressed == 'exit')
+		  {
+		    document.creatework.action ="/storeworker";
+		  }
+		  return true;
+		}
+		</script>
+
+		<!-- Script if its a popup window -->
+		<script>
+		function storepopupproduct() {
+			document.creatework.action="/storeworker?popupproduct=True";
+		}
+		</script>
+
+		<!-- Script to open popup to create location -->
+		<script>
+		function popupcreatelocation() {
+			window.open("/createlocation?popupworker=True");
+		}
+		</script>
+
+		<!-- Script for selecting location -->
+		<script>
+		function setlocation(element, key) {
+			if (element.className == 'thumbnail thumbnail-selected') {
+				element.className= 'thumbnail';
+				document.getElementById('location_temp').value = '-1';
+			} else {
+				document.getElementById('location_temp').value = key;
+				$('.thumbnail-selected').attr('class', 'thumbnail'); 
+				element.className = 'thumbnail thumbnail-selected';
+			}
+		}
+		
+		function refreshlocationtemp() {
+			var locationtemp = document.getElementById('location_temp').value;
+			if (locationtemp != '') {
+				document.getElementById('location_temp').value = '';					
+				document.getElementById('location_' + locationtemp).className = 'thumbnail';
+			}
+			if (location != '') {
+				document.getElementById('location_' + document.getElementById('location').value).className = 'thumbnail thumbnail-selected';
+			}
+		}
+		
+		function refreshlocation() {
+			document.getElementById('location').value = '';
+			document.getElementById('current_location').innerHTML = '';
+			document.getElementById('current_location_outer').className = 'hidden';
+			$('.thumbnail-selected').attr('class', 'thumbnail'); 
+		}
+		
+		function finalizelocation() {
+			var locationtemp = document.getElementById('location_temp').value;
+			if (locationtemp == '-1') {
+				refreshlocation();
+			} else if (locationtemp != '') {
+				document.getElementById('location').value = locationtemp;
+				document.getElementById('current_location').innerHTML = document.getElementById('location_' + locationtemp).innerHTML
+				document.getElementById('current_location_outer').className = '';
+			}
+			refreshlocationtemp();
+		}
+		
+		function initializelocationselect() {
+			$('#myModal').bind('hide', refreshlocationtemp());
+		}
+		</script>
+		
+		<!-- Image upload and cropping script -->
+		<script type="text/javascript" src="scripts/benetagimgcropcreate.js"></script>
+	</head>
+
+	<body onload="initializecrop(); initializelocationselect();">
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+
+			<div class="row">
+				<div class="span8">    
+					<form name="creatework" onsubmit="finishcrop(); return onsubmitform();" enctype="multipart/form-data" method="post" class="form-horizontal">
+						<fieldset>
+						<legend>Create worker profile</legend>
+			
+						{% if added %}
+							<div class="top-padded">
+								<div class="alert alert-success">Worker added successfully</div>
+							</div>
+						{% endif %}
+						{% if repeatname %}
+							<div class="top-padded">
+								<div class="alert alert-danger">Worker with this name already exists. If you want to create a new worker with the same name, please add a unique ID.</div>
+							</div>
+						{% endif %}
+						{% if repeatid %}
+							<div class="top-padded">
+								<div class="alert alert-danger">Worker with this unique ID already exists. Please add a unique ID.</div>
+							</div>
+						{% endif %}
+			
+						<!-- Name -->
+						<div class="control-group">
+							<label class="control-label" for="name">Worker name</label>
+							<div class="controls">
+								<input name="name" id="name" value="{{name_old}}" required="True"></input>
+							</div>
+						</div>
+						<!-- Location -->
+						<input name="location" id="location" class="hidden"></input>
+						<input name="location_temp" id="location_temp" class="hidden"></input>
+						<div class="control-group">
+							<label class="control-label" for="location">Location</label>
+							<div class="controls">
+								<!-- Location picker modal -->
+								<div class="modal hide fade" id="myModal">
+									<div class="modal-header">
+										<button class="close" data-dismiss="modal" onclick="refreshlocationtemp(); return false;">x</button>
+										<h3>Pick location</h3>
+									</div>
+									<div class="modal-body">
+										{% for location in locations %}	
+										{% if forloop.first %}
+										<div name="locationfrompopup" id="locationfrompopup">
+										{% endif %}
+											<div class="span2">
+												<table class="searchtable">
+													<tr>
+														<td class="searchtable img-large">
+															<ul class="thumbnails">
+																<li class="searchthumb-large">
+																<a href="#" class="thumbnail" onclick="setlocation(this, '{{location.key}}'); return false;" id='location_{{location.key}}' name='location_{{location.key}}'>
+																	<img src="locationimage?id={{location.key}}" />		
+																	<p class="center top-padded-small">{{location.name}}</p>
+																</a>
+																</li>
+															</ul>
+														</td>
+													</tr>
+												</table>
+											</div>
+										{% if forloop.last %}
+										</div>									
+										{% endif %}
+										{% empty %}	
+										<div name="locationfrompopup" id="locationfrompopup">			
+										</div>
+										<div name="removelocationfrompopup" id="removelocationfrompopup">
+											<div class="alert">
+												You haven't added any locations yet. <br />
+												Add one by clicking <strong><a href="#" onclick="popupcreatelocation();return false;">here</a></strong> and you will be returned to this form with all your data afterwards. 
+											</div>
+										</div>
+										{% endfor %}
+									</div>
+									<div class="modal-footer">
+										<button class="btn btn-primary" data-dismiss="modal" onclick="finalizelocation(); return false;">Done</button>
+										<button class="btn" data-dismiss="modal" onclick="refreshlocationtemp(); return false;">Cancel</button>
+									</div>
+								</div>																	
+								<!-- Currently picked location -->
+								<div class="hidden" id='current_location_outer' name='current_location_outer'>
+									<a class="on-thumbnail-top-right" href="#" onclick="refreshlocation(); return false;"><strong>x<strong></a>
+									<table class="searchtable">
+										<tr>
+											<td class="searchtable img-large">
+												<ul class="thumbnails">
+													<li class="searchthumb-large">
+													<a href="#" class="thumbnail" id='current_location' name='current_location'>
+													</a>
+													</li>
+												</ul>
+											</td>
+										</tr>
+									</table>
+								</div>								
+								<a class="btn btn-primary" data-toggle="modal" href="#myModal"><i class="icon-chevron-right btn-icon icon-white"></i> Pick a location</a>
+								<a class="btn" href="#" onclick="popupcreatelocation();return false;"><i class="icon-plus-sign btn-icon"></i> Create new location</a>
+								<p class="help-block">The location that this worker is primarily associated with</p>
+								<!--<a rel="popover" data-content="The location that this worker is primarily associated with"> [?] </a>-->
+							</div>		
+						</div>
+						<!-- Profile -->
+						<div class="control-group">
+							<label class="control-label" for="profile">Profile</label>
+							<div class="controls">
+								<textarea name="profile" id="profile" rows="8">{{profile_old}}</textarea>
+								<p class="help-block">Tell us something about this worker</p>
+								<!--<a rel="popover" data-content="Something about the worker"> [?] </a>-->
+							</div>		
+						</div>
+						<!-- Picture -->
+						<!-- cropping modal -->
+						<div class="modal hide fade" id="myModal">
+							<div class="modal-header">
+								<h3>Crop image</h3>
+							</div>
+							<div class="modal-body">
+								<img id="img_crop" name="img_crop"></img>
+							</div>
+							<div class="modal-footer">
+								<button class="btn" data-dismiss="modal">Save</button>
+							</div>
+						</div>
+						
+						<!-- hidden phone -->
+					    <div class="hidden-desktop">
+							<div class="alert">
+                                Unfortunately you can only add picture from a desktop machine.
+                            </div>
+						</div>
+					    <div class="control-group visible-desktop">
+							<label class="control-label" for="picture">Picture</label>
+							<div class="controls">
+								<div name="file_div" id="file_div">
+									<input type="file" id="files" name="files[]" accept="image/*" />
+								</div>
+								<img class="hidden" id="preview" name="preview"></img> <!-- copy of image -->
+								<canvas class="hidden" id="canvas" name="canvas" width="150" height="150"></canvas> <!-- preview canvas for cropping -->
+								<canvas class="hidden" id="canvashidden" name="canvashidden" width="150" height="150"></canvas> <!-- hidden canvas for cropping data -->
+								<textarea class="hidden" id="picturedata" name="picturedata"></textarea> <!-- actual return box -->
+								<div id="error_txt"></div> <!-- errors, if any -->
+								<a class="hidden" data-toggle="modal" href="#myModal" id="modal_trigger"></a> <!-- hidden modal trigger -->
+								<!-- delete and crop buttons -->
+								<button class="btn btn-danger hidden" id="delete" name="delete" onclick="refresh(); return false;">Delete</button>
+								<button class="btn hidden" id="crop_btn" name="crop_btn" onclick="forceCrop(); return false;">Crop</button>
+								<p class="help-block">A picture of the worker (Max size: 512 kB) </p>
+								<!--<a rel="popover" data-content="A picture of the worker"> [?] </a>-->
+							</div>		
+						</div>
+						<!-- Unique ID -->
+						<div class="control-group">
+							<label class="control-label" for="unique">Unique ID</label>
+							<div class="controls">
+								<input name="unique" value="{{unique_old}}" id="unique"></input>
+								<p class="help-block">An optional unique ID (like an employee ID) to identify this worker. This will be useful (and necessary) if you have multiple workers in the same location with the same name</p>
+								<!--<a rel="popover" data-content="An optional unique ID (like an employee ID) to identify this worker. This will be useful (and necessary) if you have multiple workers in the same location with the same name"> [?] </a>-->
+							</div>		
+						</div>
+						<hr class="separator-line">
+						<!-- Submit -->
+						{% if popupproduct %}
+						<div class="pull-right">
+							<button type="submit" class="btn btn-primary" name="save" onclick="storepopupproduct(); return false;">Save and close</button>
+							<button type="submit" class="btn" name="close" onclick="window.close(); return false;">Cancel</button>
+						</div>
+						{% else %}
+						<div class="pull-right">
+							<button type="submit" class="btn btn-primary" name="more" onclick="document.pressed=this.name">Save and create another</button>
+							<button type="submit" class="btn btn-primary" name="exit" onclick="document.pressed=this.name">Save and view worker</button>
+							<a href="/" onclick="history.back(); return false;"><button type="cancel" class="btn">Cancel</button></a>
+						</div>
+						{% endif %}
+						</fieldset>					
+					</form>
+				</div>
+			</div>
+		  	{% include "footer.html" %}
+		</div>
+  	</body>
+</html>

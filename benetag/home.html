@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+		<script type="text/javascript">
+			  function validateForm()
+			  {
+				  var x=document.forms["search"]["query"].value;
+				  if (x==null || x=="")
+				  {
+					  insertAlertMarkup('alert', 'Come on, help a bot out! Tell me what to search for.', 'warning');
+					  return false;
+				  }
+			  }
+    	</script>  
+  </head>
+  
+  <body>
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+    		{% include "headerlogo.html" %}
+			
+			{% include "search.html" %}  
+                
+			<div class="row top-padded">
+				<div class="span12">
+					<p class="sub center"> BeneTag is your key to ethical buying. <br class="visible-phone"><a href = "/about">Learn more.</a>
+					<br>
+					</p>			
+				</div>
+			</div>
+			
+			{% include "footer.html" %}
+		</div>
+		
+	</body>
+</html>

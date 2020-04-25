@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# website: http://ogp.me/ns/fb/benetag#">
+    	<meta property="fb:app_id"      content="286512274727203" /> 
+        <meta property="og:type"        content="website" /> 
+        <meta property="og:url"         content="{{url}}" /> 
+        <meta property="og:title"       content="{{name}}" /> 
+        <meta property="og:description" content="Made by {{producer.name}}" /> 
+		<meta property="og:image"       content="{{image_url}}" />
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="apple-touch-icon" href="icon.png"/>
+        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script src="http://jquery-star-rating-plugin.googlecode.com/svn/trunk/jquery.MetaData.js" type="text/javascript" language="javascript"></script>
+        <script src="scripts/jquery.rating.js"></script>
+        {% include "styles.html" %}
+        <title>{{name}} by {{producer.name}} - BeneTag</title>
+        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script src="//connect.facebook.net/en_US/all.js"></script>
+        <link rel="stylesheet" type="text/css" href="stylesheets/jquery.rating.css" />
+        <script type="text/javascript">
+            function initialize() {
+                {% if latitude and longitude %}
+                var latlng = new google.maps.LatLng({{latitude}}, {{longitude}});
+                
+                var userLat;
+                var userLong;
+                var factName = '{{location.name}}';
+                var factAdd = '{{location.address}}';
+                
+                if (navigator.geolocation) // check if browser support this feature or not
+                {
+                    navigator.geolocation.getCurrentPosition(function(position)
+                                                             {
+                                                             userLat = position.coords.latitude;
+                                                             userLong = position.coords.longitude;
+                                                             var R = 3959; // miles
+                                                             var dLat = (userLat-({{latitude}}))*(Math.PI/180);
+                                                             var dLon = -(userLong-({{longitude}}))*(Math.PI/180);
+                                                             var lat1 = {{latitude}}*(Math.PI/180);
+                                                             var lat2 = userLat*(Math.PI/180);
+                                                             
+                                                             var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+                                                             var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+                                                             var d = R * c;
+                                                             
+                                                             document.getElementById('distance').innerHTML = '<td><div id="distance-div"> <p class="distance-value">' + d.toFixed(1) + ' mi </p> <p class="away"> away</p></div></td> <td id="info" class = "spaced">' + '<a href="/viewlocation?id={{location.key}}">' + factName + '<br>' + factAdd + '</a></td>';
+                                                           
+                                                             }, function()
+                                                             {
+                                                             	document.getElementById('distance').innerHTML = '<td id="info">' + '<a href="/viewlocation?id={{location.key}}">' + factName + '<br>' + factAdd + '</a></td>';
+                                                             });
+                }
+                
+                else {
+                	document.getElementById('distance').innerHTML = '<td id="info">' + '<a href="/viewlocation?id={{location.key}}">' + factName + '<br>' + factAdd + '</a></td>';
+                }
+                
+                {% endif %}
+                
+                FB.init({
+                        appId      : '286512274727203', // App ID
+                        channelUrl : 'benetag.com/view', // Channel File
+                        status     : true, // check login status
+                        cookie     : true, // enable cookies to allow the server to access the session
+                        oauth      : true, // enable OAuth 2.0
+                        xfbml      : true  // parse XFBML
+                        });
+            }
+            
+            function fbshare() {
+                FB.login(function(response) {
+                         if (response.authResponse) {
+                         var request = $.ajax({
+                                              url: "https://graph.facebook.com/me/benetag:share",
+                                              type: "POST",
+                                              data: {website : '{{url}}', access_token: response.authResponse.accessToken},
+                                              success: function(data) {
+                                              },
+                                              });
+                         }
+                         }, {scope : 'publish_actions'});
+            }
+        </script>
+        
+        <script type="text/javascript" language="javascript">
+			{%if enable_rating%}
+            
+			function sendRating(){
+			 $.post('changerating', $('#ratingform1').serialize(), function(data){});
+			};
+		{%endif%}
+		</script>
+		
+	
+		<script type="text/javascript" src="//assets.pinterest.com/js/pinit.js"></script>
+        <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+    	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+    </head>
+    
+    
+    <body onload="initialize()">
+	
+        <div class="container">            
+            
+          	{% include "navbar.html" %}
+          	<hr class="space">
+
+            <div class="row">
+            	<div class="span6">
+					<div class="visible-phone">
+						<img src="productimage?id={{config_key}}" class="searchthumb pull-right"></img>
+					</div>
+					
+					<!-- basic product info-->
+					<p class="producer-name"><a href="/viewproducer?id={{producer.key}}">{{producer.name}}</a> </p>
+					<p class="product-name bottom-padded"> {{ name }} </p>
+						
+					<!-- Rating Stars-->	
+					<table id="productinfo">	
+						<td id="producttextinfo"></td>
+						<td>
+						<div {%if enable_rating%} onclick="sendRating()" {%endif%}>
+							<form id="ratingform1" onsubmit="sendRating(); return false;">
+								<input value="0.25" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 0.25%}checked="true"{%endif%}/>
+                                <input value="0.5" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 0.5%}checked="true"{%endif%}/>
+                                <input value="0.75" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 0.75%}checked="true"{%endif%}/>
+                                <input value="1.0" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 1.0%}checked="true"{%endif%}/>
+                                <input value="1.25" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 1.25%}checked="true"{%endif%}/>
+                                <input value="1.5" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 1.5%}checked="true"{%endif%}/>
+                                <input value="1.75" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 1.75%}checked="true"{%endif%}/>
+                                <input value="2.0" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 2.0%}checked="true"{%endif%}/>
+                                <input value="2.25" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 2.25 %}checked="true"{%endif%}/>
+                                <input value="2.5" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 2.5%}checked="true"{%endif%}/>
+                                <input value="2.75" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 2.75%}checked="true"{%endif%}/>
+                                <input value="3.0" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 3.0%}checked="true"{%endif%}/>
+                                <input value="3.25" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 3.25%}checked="true"{%endif%}/>
+                                <input value="3.5" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 3.5%}checked="true"{%endif%}/>
+                                <input value="3.75" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 3.75%}checked="true"{%endif%}/>
+                                <input value="4.0" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 4.0%}checked="true"{%endif%}/>
+                                <input value="4.25" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 4.25%}checked="true"{%endif%}/>
+                                <input value="4.5" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 4.5%}checked="true"{%endif%}/>
+                                <input value="4.75" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 4.75%}checked="true"{%endif%}/>
+                                <input value="5.0" name="adv1" type="radio" class="star {split:4}" {%if not enable_rating%} disabled="disabled"{%endif%} {%if rating == 5.0%}checked="true"{%endif%}/>
+								<input name="productConfigKey" style="display:none" value="{{config_key}}"></input>
+							</form>	
+							</div>
+       	 				</td>
+					</table>
+					
+					<div class="bottom-padded">
+						<!--buttons-->
+						{% if can_edit %}
+							{% if is_config %}
+								<!-- Delete modal -->
+								<div class="modal hide fade" id="myModal">
+									<div class="modal-header">
+										<button class="close" data-dismiss="modal">×</button>
+										<h3>Delete this entry?</h3>
+									</div>
+									<div class="modal-body">
+										<p>Are you sure you want to delete this configuration? All products linked to it will be affected.<br /> {% if last_config %} Additionally, since this is the last configuration of this product line, the entire product line will be deleted. {% endif %}</p>
+									</div>
+									<div class="modal-footer">
+										<button class="btn" data-dismiss="modal">Close</button>
+										<a class="btn btn-danger" href="/deleteconfig?id={{id}}"><i class="icon-trash btn-icon icon-white"></i> Delete this configuration</a>
+									</div>
+								</div>
+								
+								<!-- buttons - edit, qrcode, messaging-->
+								<a class="btn "href="{{edit_link}}"><i class="icon-edit btn-icon"></i><span class="hidden-phone"> Edit this page</span></a>
+								<a class="btn "href="/createunits?id={{productconfig.key}}"><i class="icon-qrcode btn-icon"></i><span class="hidden-phone"> Print more QR codes</span></a>
+								<a class="btn "href="/producerwritemsg?id={{id}}"><i class="icon-envelope btn-icon"></i><span class="hidden-phone"> Message people who own this</span></a>
+
+							{% endif %}
+							{% if is_unit %}
+								<!-- Delete modal -->
+								<div class="modal hide fade" id="myModal">
+									<div class="modal-header">
+										<button class="close" data-dismiss="modal">×</button>
+										<h3>Delete this entry?</h3>
+									</div>
+									<div class="modal-body">
+										<p>Are you sure you want to delete this product unit? </p>
+									</div>
+									<div class="modal-footer">
+										<button class="btn" data-dismiss="modal">Close</button>
+										<a class="btn btn-danger" href="/deleteunit?id={{id}}"><i class="icon-trash btn-icon icon-white"></i> Delete this unit</a>
+									</div>
+								</div>
+								
+								<!-- buttons - edit, qrcode, messaging-->								
+								<a class="btn "href="{{edit_link}}"><i class="icon-edit btn-icon"></i><span class="hidden-phone"> Edit this page</span></a>
+								<a class="btn "href="/createunits?id={{productconfig.key}}"><i class="icon-qrcode btn-icon"></i><span class="hidden-phone"> Print more QR codes</span></a>
+								<a class="btn "href="/producerwritemsg?id={{productconfig.key}}"><i class="icon-envelope btn-icon"></i><span class="hidden-phone"> Message people who own this</span></a>
+							{% endif %}
+						{% endif %}
+						
+						<!-- Stats modal -->
+						<div class="modal hide fade" id="myModal_stats">
+							<div class="modal-header">
+								<button class="close" data-dismiss="modal">×</button>
+								<h3>Stats for this product</h3>
+							</div>
+							<div class="modal-body">
+								<p>
+								<ul>
+									{% if otherconfig %}<li> This product is made in <a href="{{config_link}}">{{num_other_configs}} other way{% if more_than_one_other_config %}s{% endif %}</a></li> {% endif %}
+									<li>There are {{num_products}} of the same product with BeneTags on them {% if can_edit %} <a class="left-padded" title="Add" href="/createunits?id={{productconfig.key}}"><i class="icon-plus btn-icon"></i></a> {% endif %}</li>
+									<li>{{closet_count}} people have this product in their closets. </li>
+								</ul>
+								</p>
+							</div>
+							<div class="modal-footer">
+								<button class="btn" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+						
+						<!-- closet buttons -->
+						{% if in_closet %}
+							<a class="btn "href="{{rem_closet_link}}"><i class="icon-minus btn-icon"></i> Remove from closet</a>
+						{% endif %}
+						{% if add_closet %}
+							<a class="btn "href="{{add_closet_link}}"><i class="icon-plus btn-icon"></i> Add to closet</a>
+						{% endif %}
+						
+						<!-- stats button -->
+						{% if can_edit %}
+							<a class="btn" data-toggle="modal" href="#myModal_stats"><i class="icon-question-sign btn-icon"></i><span class="hidden-phone"> View stats</span></a>
+						{% else %}
+							<a class="btn" data-toggle="modal" href="#myModal_stats"><i class="icon-question-sign btn-icon"></i> View stats</a>
+						{% endif %}
+						
+						<!-- delete buttons -->
+						{% if can_edit %}
+							{% if is_config %}
+								<a class="btn btn-danger" data-toggle="modal" href="#myModal"><i class="icon-trash btn-icon icon-white"></i><span class="hidden-phone"> Delete this configuration</span></a>
+							{% endif %}
+							{% if is_unit %}
+								<a class="btn btn-danger" data-toggle="modal" href="#myModal"><i class="icon-trash btn-icon icon-white"></i><span class="hidden-phone"> Delete this unit</span></a>
+							{% endif %}
+						{% endif %}
+							
+					</div>
+				</div>
+				<div class="span6 hidden-phone">
+					<img class="pull-right" src="/productimage?id={{config_key}}" style="width:inherit;"></img>
+				</div>
+			</div>
+			
+			<div class="top-padded">
+				<hr class="top-line spaced">
+			</div>
+			
+			<div class="row">
+				
+				<!--left column-->
+				<div class="span7">
+					
+					<!--badges-->
+					{%if has_badges%}
+						
+						<table id="badges">	
+							{% for badge in badges %}
+								{%if forloop.counter0|divisibleby:3 %} 
+									<tr> 
+								{%endif%}
+									<td><img id="badgeimage" src="badgeimage?key={{badge.key}}"></img </td>
+								{%if forloop.counter|divisibleby:3 %} 
+									</tr> 
+								{%endif%}
+							{%endfor%}
+						</table>
+						<hr class="separator-line">
+						
+					{%endif%}
+				
+					<!--Detailed product info-->
+					<p class="section-heading">More info:</p>
+					<p class="info bottom-padded">{{productconfig.getDescription|linebreaksbr}} </p>
+					{% if AmazonURL and price %}
+					<p class="price"> {{price}} </p>
+					<table id="buy-buttons">
+						<tr>
+							<td><button class="btn buy" id="sugretailer" onclick = "window.open('{{AmazonURL}}')">Buy on Amazon</button></td>
+						</tr>
+					</table>
+					{% endif %}
+					{% if has_store_link %}
+					<p class="price"> ${{storePrice}} </p>
+					<table id="buy-buttons">
+						<tr>
+							<td><button class="btn buy" id="retailerbutton" onclick = "window.open('{{storeUrl}}')">Buy on {{storeName}}</button></td>
+						</tr>
+					</table>
+					{% endif %}
+					<hr class="separator-line">
+
+					<!--Location-->
+
+					{% if location %}	
+						<p class="section-heading">Originated at:</p>
+						<table id="location-table">
+							<tr id = "distance"> 
+							</tr>
+						</table>
+						<p class="more-info"> <a href="/viewpath?id={{id}}">see this product's path <i class="icon-chevron-right btn-icon"></i></a></p>
+						<hr class="separator-line">
+					{% endif %}
+				
+					<!--Workers-->
+					{% if has_workers %}
+						<p class="section-heading">Made by:</p>
+						<p class="info"><a href="/viewworker?id={{worker.key}}">{{worker.name}}</a>
+						{% if has_multiple_workers %}
+							and <a href="/viewproductworkers?id={{id}}">{{num_other_workers}} other{% if more_than_one_other %}s{% endif %}</a>.
+						{% endif %}
+						</p>
+						
+						<p class="more-info"> <a href="/viewproductworkers?id={{id}}">see more about these workers <i class="icon-chevron-right btn-icon"></i> </a></p>
+				
+						<hr class="separator-line">
+					{% endif %}
+					
+					
+					<!--phone sharing-->
+					<div class="visible-phone">
+						<p class="section-heading">Share this product:</p>
+						<div id="social-buttons">
+							<div class="fb-like social-row" data-send="true" data-layout="button_count" data-width="inherit" data-show-faces="true"></div>
+							<div class="social-row"><a href="https://twitter.com/share" class="twitter-share-button" data-size="large" data-hashtags="BeneTag">Tweet</a></div>
+							<div class="social-row"><g:plusone></g:plusone></div>
+							<div class="social-row">
+							<a href="http://pinterest.com/pin/create/button/?url={{url}} &media={{image_url}}&description=Made by {{producer.name}}" class="pin-it-button" count-layout="horizontal"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a></div>
+						</div>	
+						<hr class="separator-line">
+					</div>
+					
+					<!-- Facebook comments -->
+					<div id="fb-root"></div>
+						<script>(function(d, s, id) {
+							  var js, fjs = d.getElementsByTagName(s)[0];
+							  if (d.getElementById(id)) return;
+							  js = d.createElement(s); js.id = id;
+							  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+							  fjs.parentNode.insertBefore(js, fjs);
+							}(document, 'script', 'facebook-jssdk'));
+						</script>
+					<div class="fb-comments" data-href="{{comment_url}}" data-num-posts="20" data-width="inherit"></div>	
+					
+				</div>
+			
+				<!--right column-->
+				<div class="span4">
+					<div class="hidden-phone">
+						<!--Share buttons-->
+						<p class="section-heading">Share this product:</p>
+						<div id="social-buttons">
+							<div class="fb-like social-row" data-send="true" data-layout="button_count" data-width="inherit" data-show-faces="true"></div>
+							<div class="social-row"><a href="https://twitter.com/share" class="twitter-share-button" data-size="large" data-hashtags="BeneTag">Tweet</a></div>
+							<div class="social-row"><g:plusone></g:plusone></div>
+							<div class="social-row">
+							<a href="http://pinterest.com/pin/create/button/?url={{url}} &media={{image_url}}&description=Made by {{producer.name}}" class="pin-it-button" count-layout="horizontal"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a></div>
+						</div>			
+						<hr class="separator-line hidden-phone">
+					</div>
+				</div>
+			
+			</div>
+			
+			
+			<!--<div class="row">
+				<p class = "comments-link"> 59 reviews > </p>
+				<hr class="separator-line">
+			</div>-->
+			
+			
+			{% include "footer.html" %}
+			
+		</div>
+    
+    </body>
+</html>

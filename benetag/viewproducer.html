@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+		
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+	</head>
+
+	<body>
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+			
+			<div class="row">
+				<div class="span6">
+					<div class="visible-phone">
+						<img src="producerimage?id={{id}}" class="searchthumb pull-right"></img>
+					</div>
+				
+					<p class="section-heading">Producer Profile</p>
+					<p class="product-name">{{producer.name}}</p>
+					{% if email_public %}<p class= "bottom-padded">{{email_public}}</p> {% endif %}
+	
+					{% if can_edit %}
+					<div class="bottom-padded">
+						<a class="btn "href="{{edit_link}}"><i class="icon-edit btn-icon"></i> Edit your profile</a>
+					</div>
+					{% endif %}
+										
+					{% if producer.description %}
+						<hr class="top-line spaced">
+						<p class="section-heading">About:</p>
+						<p class= "info">{{producer.description|linebreaksbr}}</p>
+					{% endif %}
+				</div>
+				
+				<div class="span6 hidden-phone">
+					<img class="pull-right" src="producerimage?id={{id}}" style="width:inherit;"></img>
+				</div>	
+			</div>
+			
+			<div class="top-padded">
+                <hr class="top-line spaced">
+            </div>	
+			
+			<div class="row">
+				<div class="span4">
+				
+					<!-- Product lines -->
+					<p class="section-heading"><a href="/viewproducerproducts?id={{id}}">Product Lines</a></p>
+					<table class="searchtable bottom-padded">
+						{% for p in product_lines %}
+                            <tr>
+                                <!-- image -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/view?id={{p.key}}" class="thumbnail">
+                                            <img src="productimage?id={{p.key}}"></img>
+                                        </a>
+                                        <li>
+                                    </ul>
+                                </td>
+                                
+                                <!-- info -->
+                                <td class = "searchtable info" >
+                                     <p class="search"><a href="/view?id={{p.key}}">{{p.name}}</a></p>
+                                     <p class="search sub">{{p.shortDescription}}</p>
+                                </td>
+                            </tr>
+						{% empty %}
+						<div class="alert">
+								<h4 class="alert-heading b">Oops!</h4> 
+								Looks like {{producer.name}} hasn't added any products yet. 
+						</div>
+						{% endfor %}
+					</table>
+					{% if can_edit %}
+					<a class="btn" href="/myproducts"><i class="icon-chevron-right btn-icon"></i> See all</a>
+					<a class="btn btn-primary" href="/createproduct"><i class="icon-plus-sign icon-white btn-icon"></i> Add a product line</a>
+					{% else %}
+					<a class="btn" href="/viewproducerproducts?id={{id}}"><i class="icon-chevron-right btn-icon"></i> See all</a>
+					{% endif %}
+					<hr class="separator-line visible-phone">
+				</div>
+				
+				<!-- Locations -->
+				<div class="span4">
+					<p class="section-heading"><a href="/viewproducerlocations?id={{id}}">Manufacturing Locations</a></p>		
+					<table class="searchtable bottom-padded">
+						{% for p in locations %}
+							<tr>
+                                <!-- image -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/viewlocation?id={{p.key}}" class="thumbnail">
+                                            <img src="locationimage?id={{p.key}}"></img>
+                                        </a>
+                                        <li>
+                                    </ul>
+                                </td>
+                                
+                                <!-- info -->
+                                <td class = "searchtable info" >
+                                     <p class="search"><a href="/viewlocation?id={{p.key}}">{{p.name}}</a></p>
+                                     <p class="search sub">{{p.shortDescription}}</p>
+                                </td>
+                            </tr>
+						{% empty %}
+						<div class="alert">
+								<h4 class="alert-heading b">Oops!</h4> 
+								Looks like {{producer.name}} hasn't added any locations yet. 
+						</div>
+						{% endfor %}
+					</table>
+					
+					{% if can_edit %}
+					<a class="btn" href="/mylocations"><i class="icon-chevron-right btn-icon"></i> See all</a>
+					<a class="btn btn-primary" href="/createlocation"><i class="icon-plus-sign icon-white btn-icon"></i> Add a location</a>
+					{% else %}
+					<a class="btn" href="/viewproducerlocations?id={{id}}"><i class="icon-chevron-right btn-icon"></i> See all</a>
+					{% endif %}
+					<hr class="separator-line visible-phone">
+				</div>
+				
+				<!-- Workers -->
+				<div class="span4">
+					<p class="section-heading"><a href="/viewproducerworkers?id={{id}}">Workers</a></p>
+					<table class="searchtable bottom-padded">
+						{% for p in workers %}
+							<tr>
+                                <!-- image -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/viewworker?id={{p.key}}" class="thumbnail">
+                                            <img src="workerimage?id={{p.key}}"></img>
+                                        </a>
+                                        <li>
+                                    </ul>
+                                </td>
+                                
+                                <!-- info -->
+                                <td class = "searchtable info" >
+                                     <p class="search"><a href="/viewworker?id={{p.key}}">{{p.name}}</a></p>
+                                     <p class="search sub">{{p.shortDescription}}</p>
+                                </td>
+                            </tr>
+						{% empty %}
+						<div class="alert">
+								<h4 class="alert-heading b">Oops!</h4> 
+								Looks like {{producer.name}} hasn't added any worker profiles yet. 
+						</div>
+						{% endfor %}
+					</table>
+					{% if can_edit %}
+					<a class="btn" href="/myworkers"><i class="icon-chevron-right btn-icon"></i> See all</a>
+					<a class="btn btn-primary" href="/createworker"><i class="icon-plus-sign icon-white btn-icon"></i> Add a worker</a>
+					{% else %}
+					<a class="btn" href="/viewproducerworkers?id={{id}}"><i class="icon-chevron-right btn-icon"></i> See all</a>
+					{% endif %}
+				</div>
+			</div>
+			
+			{% include "footer.html" %}
+		</div>
+	</body>
+</html>

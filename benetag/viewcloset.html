@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+		<script type="text/javascript">
+			  function validateForm()
+			  {
+				  var x=document.forms["search"]["query"].value;
+				  if (x==null || x=="")
+				  {
+					  insertAlertMarkup('alert', 'Come on, help a bot out! Tell me what to search for.', 'warning');
+					  return false;
+				  }
+			  }
+    	</script>  
+	</head>
+
+	<body>
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+
+			<div class="row">
+				<div class="span12">
+					<p class="product-name">{{consumer.name}}'s closet</p>
+					<p class="section-heading bottom-padded">
+					{% if can_edit_local %} A collection of products that you own
+					{% else %} A collection of products that they own
+					{% endif %}
+					</p>
+					<hr class="top-line spaced">
+				</div>				
+			</div>
+			<div class="row">
+				<div class="span4">
+					<table class="searchtable">
+						{% for p in products %}
+							{% if can_edit_local %}
+								<div class="modal hide fade" id="myModal_{{forloop.counter}}">
+									<div class="modal-header">
+										<button class="close" data-dismiss="modal">×</button>
+										<h3>Delete this entry?</h3>
+									</div>
+									<div class="modal-body">
+										<p>Are you sure you want to remove this product from your closet?</p>
+									</div>
+									<div class="modal-footer">
+										<button class="btn" data-dismiss="modal">Close</button>
+										<a class="btn btn-danger" href="/removefromcloset?id={{p.key}}&source=closet"><i class="icon-trash btn-icon icon-white"></i> Remove</a>
+									</div>
+								</div>
+							{% endif %}
+							<tr>
+								<!-- image -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/view?id={{p.key}}" class="thumbnail">
+                                            <img src="productimage?id={{p.key}}"></img>
+                                        </a>
+                                        <li>
+                                    </ul>
+                                </td>
+								<!-- info -->
+                                <td class = "searchtable info" >
+									<p class="search pull-right">
+										{% if can_edit_local %}<a class="left-padded" title="Remove" data-toggle="modal" href="#myModal_{{forloop.counter}}"><i class="icon-remove btn-icon"></i></a>{% endif %}
+									</p>
+                                    <p class="search">
+										<a href="/view?id={{p.key}}">{{p.name}}</a>
+									</p>
+									<p class="search">by <a class="search sub" href="/viewproducer?id={{p.getProducer.key}}">{{p.getProducer.name}}</a></p>
+                                    <p class="search sub">{{p.shortDescription}}</p>
+                                </td>		
+							</tr>
+						{% empty %}
+							<div class="alert alert-block">
+								<h4 class="alert-heading">Whoa!</h4>
+								{% if can_edit_local %} Looks like you haven't added any products yet!
+								{% else %} Looks like they haven't added any products yet!
+								{% endif %}
+							</div>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+
+			{% include "footer.html" %}
+		</div>
+	</body>
+</html>

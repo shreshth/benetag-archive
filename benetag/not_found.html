@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title> BeneTag </title>
+	</head>
+    <body>
+    	<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+			
+			<div class = "row">
+				<div class="span12">
+					<p class="product-name">Error 404: Looks like that page does not exist on our server! Check the address if you typed it yourself or send us an email at info@benetag.com if you clicked a link to get this page.</p>
+					<div class = span5 offset1">
+						<p><a href="/">Home</a></p>
+						<p><a href="/" onclick="history.back(); return false;">Go back to the last page</a></p>
+					</div>
+				</div>
+        		</div>
+        
+        {% include "footer.html" %}
+	</div>
+    </body>
+</html>

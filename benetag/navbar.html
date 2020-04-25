@@ -1,0 +1,75 @@
+<div class="navbar">
+	<div class="navbar-inner">
+		<div class="container">
+ 
+			<!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</a>
+ 
+			<!-- Be sure to leave the brand out there if you want it shown -->
+			<a class="brand" href="/">Bene<strong>Tag</strong></a>
+ 
+			<!-- Everything you want hidden at 940px or less, place within here -->
+			<div class="nav-collapse">
+				<!-- .nav, .navbar-search, .navbar-form, etc -->
+				
+				<!-- Note that exactly one or zero of the following will be true -->
+				{% if signedinconsumer %}
+				<ul class="nav">
+					<li {% if path == "profile"%} class="active" {% endif %}><a href="/myprofile">My profile</a></li>
+					<li {% if path == "/mycloset"%} class="active" {% endif %}><a href="/mycloset">Closet</a></li>
+					<li {% if path == "message"%} class="active" {% endif %}><a href="/myinbox">Inbox  {% if hasunread > 0 %}<span class="badge">{{hasunread}}</span>{% endif %}</a></li>
+				</ul>
+				{% endif %}
+				{% if signedinproducer %} 
+				<ul class="nav">
+					<li {% if path == "profile"%} class="active" {% endif %}><a href="/myprofile">My profile</a></li>
+					<li {% if path == "worker"%} class="active" {% endif %}><a href="/myworkers">Workers</a></li>
+					<li {% if path == "location"%} class="active" {% endif %}><a href="/mylocations">Locations</a></li>
+					<li {% if path == "product"%} class="active" {% endif %}><a href="/myproducts">Products</a></li>
+					<li {% if path == "message"%} class="active" {% endif %}><a href="/myoutbox">Outbox</a></li>
+				</ul>
+				{% endif %}
+
+				<!-- Right side elements: edit page, add/rem closet, logout, login -->
+				<ul class="nav pull-right">
+				<!-- Exactly one of the following ifs will be true -->
+				{% if notsignedin %}
+					<li> <a href='/signup?producer=True'>Producer sign-in</a></li>
+					<li> <a href='/signup?consumer=True'>Consumer sign-in</a></li>
+				{% endif %}						
+				<!--{% if can_edit %}
+					{% if show_qr %}
+						<li><a href="{{qr_url}}">Get QR code</a></li>
+					{% endif %}
+					<li><a href="{{edit_link}}">Edit this page</a></li>
+					<li><a href="/logout">Logout</a></li>
+				{% endif %}
+				{% if in_closet %}
+					<li><a href="{{rem_closet_link}}">Remove from closet</a></li>
+					<li><a href="/logout">Logout</a></li>
+				{% endif %}
+				{% if add_closet %}
+					<li><a href="{{add_closet_link}}">Add to closet</a></li>
+					<li><a href="/logout">Logout</a></li>
+				{% endif %}
+				{% if not notsignedin and not can_edit and not in_closet and not add_closet %}
+					<li><a href="/logout">Logout</a></li>
+				{% endif %}-->
+				{% if not notsignedin %}
+					<li><a href="/logout">Logout</a></li>
+				{% endif %}
+					<li class="divider-vertical"></li>
+					<li> <!-- Search bar is rightmost on all pages -->
+						<form class="navbar-search pull-right hidden-phone hidden-tablet" action="/productsearchresult" method="post">
+							<input name="query" type="search" class="search-query" autocomplete="off" placeholder="Search">
+						</form>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

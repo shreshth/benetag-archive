@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript" src="scripts/benetagpopover.js"></script>
+		<script>
+			var map;
+			var locations = [ {% for location in locations %} {% if location.location %} [{{location.location.lat}}, {{location.location.lon}}, "{{location.name}}", "{{location.address}}", "{{location.key}}"], {% endif %} {% endfor %}]
+
+			function initialize() {
+			    var mapOptions = {
+				center: new google.maps.LatLng(39.095963, -102.744141),
+				zoom: 2,
+				mapTypeId: google.maps.MapTypeId.HYBRID,
+				mapTypeControl: false,
+				streetViewControl: false,
+			    };
+			    map = new google.maps.Map(document.getElementById("big_map"), mapOptions);
+			    addpoints();
+			}
+
+			function addpoints() {
+			    for (var i = 0; i < locations.length; i++) {
+				    var lat = locations[i][0]
+				    var lng = locations[i][1]
+				    var location = new google.maps.LatLng(lat, lng);
+				    marker = new google.maps.Marker({
+						position: location,
+						map: map,
+				    });
+
+   				    var infowindow = new google.maps.InfoWindow({
+				    });
+
+				    google.maps.event.addListener(marker, 'click', (function(marker, i) {
+        			    	return function() {
+          					infowindow.setContent("<a href=\"/viewlocation?id="+locations[i][4]+"\">" + locations[i][2] +"<br>" + locations[i][3] + "</a>");
+          					infowindow.open(map, marker);
+        				}
+      				    })(marker, i));
+
+			    }
+			}
+		</script>
+	</head>
+
+	<body onload="initialize();">
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr class="space">
+			
+			
+			<div class="row">
+				
+				<div class="span5">
+				
+					<p class="product-name"><a href="viewproducer?id={{producer.key}}">{{producer.name}}</a></p>
+					<p class="section-heading"> All Locations </p>
+					<hr class="top-line spaced">
+					<table class="searchtable bottom-padded">
+						{% for location in locations %}
+							<!-- Delete modal -->
+							{% if can_edit_local %}
+							<div class="modal hide fade" id="myModal_{{forloop.counter}}">
+								<div class="modal-header">
+									<button class="close" data-dismiss="modal">×</button>
+									<h3>Delete this entry?</h3>
+								</div>
+								<div class="modal-body">
+									<p>Are you sure you want to delete this location? All products and workers linked to this location will be affected.</p>
+								</div>
+								<div class="modal-footer">
+									<button class="btn" data-dismiss="modal">Close</button>
+									<a class="btn btn-danger" href="/deletelocation?id={{location.key}}"><i class="icon-trash btn-icon icon-white"></i> Delete this location</a>
+								</div>
+							</div>
+							{% endif %}
+							<tr class="list-padded">
+                                <!-- image + buttons -->
+                                <td class="searchtable img">
+                                    <ul class="thumbnails">
+                                        <li class="searchthumb">
+                                        <a href="/viewlocation?id={{location.key}}" class="thumbnail">
+                                            <img src="locationimage?id={{location.key}}"></img>
+                                        </a>
+										{% if can_edit_local %}
+										<div class="top-padded-small">
+											<center>
+											<a rel="popover" title="Edit {{location.name}}" href="/editlocation?id={{location.key}}"><i class="icon-edit btn-icon"></i></a>
+											<a rel="popover" class="left-padded" title="Delete {{location.name}}" data-toggle="modal" href="#myModal_{{forloop.counter}}"><i class="icon-trash btn-icon"></i></a>
+											</center>
+										</div>
+										{% endif %}
+										</li>
+                                    </ul>
+                                </td>
+                                <!-- info -->
+                                <td class = "searchtable info" >
+                                    <p class="info"><a href="/viewlocation?id={{location.key}}">{{location.name}}</a></p>
+									<p class="sub">{{location.address}}</p>
+                                    <p class="sub">{{location.shortDescription}}</p>
+                                </td>
+                            </tr>							
+						{% empty %}
+							<div class="alert">
+								{% if can_edit_local %} <h4 class="alert-heading">Go ahead, add some locations!</h4>
+								{% else %} <h4 class="alert-heading">Whoa!</h4> Looks like they haven't added any locations yet!
+								{% endif %}
+							</div>
+						{% endfor %}
+					</table>
+					{% if can_edit_local %}
+						<a class="btn btn-primary" href="/createlocation"><i class="icon-plus-sign icon-white btn-icon"></i> Add a location</a>
+					{% endif %}
+				</div>	
+					
+				<div class="span7">
+					{% if has_locations %}
+					<div id="big_map"></div>		
+					{% endif %}
+				</div>
+					
+			</div>
+	
+			{% include "footer.html" %}
+			
+		</div>
+	</body>
+</html>

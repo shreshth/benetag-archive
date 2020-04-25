@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag</title>
+		
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+		
+		<script type="text/javascript">
+			function initialize() {
+				{% if latitude and longitude %}
+					var latlng = new google.maps.LatLng({{latitude}}, {{longitude}});
+					var myOptions = {
+						zoom: 8,
+						center: latlng,
+						mapTypeId: google.maps.MapTypeId.ROADMAP
+					};
+					var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+					document.getElementById("map_canvas").style.position="fixed";
+					var marker = new google.maps.Marker({
+						position: latlng,
+						map: map,
+					});
+				{% endif %}
+			}
+		</script>
+		<script>
+			{% if popupproduct %}
+				try {
+					window.opener.document.getElementById('removeworkerfrompopup').innerHTML = "";
+				} catch(err) { }
+				try {
+					var old_val = window.opener.document.getElementById('workerfrompopup').innerHTML;
+					var new_val = '<label class="checkbox"> \
+										<input type="checkbox" name="workers" value ="{{worker.key}}"> \
+											{{worker.name}} {% if worker.unique %} ({{worker.unique}}) {% endif %} \
+										</input> \
+									</label>';
+					window.opener.document.getElementById('workerfrompopup').innerHTML = old_val + new_val;
+					self.close();
+				} catch(err) { }
+			{% endif %}
+		</script>
+												
+	</head>
+
+	<body onload="initialize()">
+		<div class = "container">
+			{% include "navbar.html" %}
+			
+			<hr class="space">			
+			
+			<div class="row">
+				<div class="span6">
+					<div class="visible-phone">
+						<img src="workerimage?id={{id}}" class="searchthumb pull-right"></img>
+					</div>
+				
+					<p class="section-heading">Worker Details</p>
+					
+					<p class="product-name">{{ name }}</p>
+					<p>Employed by: <a href="/viewproducer?id={{producer.key}}">{{producer.name}}</a></p>
+					{% if worker.getLocation %}
+					<p class="bottom-padded">Works at : <a href="/viewlocation?id={{location.key}}">{{location.name}}</a></p>
+					{% endif %}
+					
+					{% if can_edit %}
+						<div class="bottom-padded">
+							<div class="modal hide fade" id="myModal">
+								<div class="modal-header">
+									<button class="close" data-dismiss="modal">×</button>
+									<h3>Delete this entry?</h3>
+								</div>
+							  	<div class="modal-body">
+									<p>Are you sure you want to delete this worker? All products and locations linked to this worker will be affected.</p>
+								</div>
+								<div class="modal-footer">
+									<button class="btn" data-dismiss="modal">Close</button>
+									<a class="btn btn-danger" href="/deleteworker?id={{id}}"><i class="icon-trash btn-icon icon-white"></i> Delete this worker</a>
+							  	</div>
+							</div>
+							<a class="btn "href="{{edit_link}}"><i class="icon-edit btn-icon"></i> Edit this profile</a>
+							<a class="btn btn-danger" data-toggle="modal" href="#myModal"><i class="icon-trash btn-icon icon-white"></i> Delete this worker profile</a>
+						</div>
+					{% endif %}
+					
+					{% if profile %}
+						<hr class="top-line spaced">
+						<p class="section-heading">Their Story</p>
+						<p class="info">{{profile|linebreaksbr}}</p>
+					{% endif %}
+				</div>
+				
+				<div class="span6 hidden-phone">
+					<img class="pull-right" id="workerimage" src="/workerimage?id={{id}}" style="width:inherit;"></img>
+				</div>
+				
+			</div>
+			
+			<div class="top-padded">
+				<hr class="top-line spaced">
+			</div>
+			
+			<div class="row">
+				<div class="span5">
+					<p class="section-heading">Products:</p>
+					{% for product in products %}
+						<p><a href="/view?id={{product.key}}">{{product.name}}</a></p>
+					{% empty %}
+					<div class="alert">
+							<h4 class="alert-heading b">Oops!</h4> 
+							Looks like {{name}} hasn't been added as a worker to any products yet. 
+					</div>
+					{% endfor %}
+				</div>
+				<div class="span5 offset1">
+					{% if latitude and longitude %}
+                        <div id="map_canvas"></div>
+                        <hr class="separator-line">
+					{% endif %}
+				</div>
+			</div>
+			
+			{% include "footer.html" %}
+		</div>
+	</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include "styles.html" %}
+    <title>BeneTag</title>
+  </head>
+  <body>
+	{% include "navbar.html" %}
+	{% include "headerlogo.html" %}
+    <form action="/productsearchresult" method="post">
+      <div>Product name: <input name="query"></input></div>
+      <div><input type="submit" value="Search"></div>
+    </form>
+	
+	{% include "footer.html" %}
+	
+  </body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<body>
+		<div id="qrimage">
+			{% for productkey in productkeys %}
+				<img src="/qr?id={{productkey}}"></img>
+			{% empty %}
+				No products added
+			{% endfor %}
+		</div><br />
+		<a href="/view?id={{id}}">Return</a>
+
+	</body>
+</html>

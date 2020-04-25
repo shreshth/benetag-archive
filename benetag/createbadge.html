@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include "styles.html" %}
+		<title>BeneTag - Create badge</title>
+
+		<!-- Script for disambiguating between two submits -->
+		<script type="text/javascript">
+		function onsubmitform()
+		{
+		  if(document.pressed == 'more')
+		  {
+		   document.createbadge.action ="/storebadge?more=True";
+		  }
+		  else
+		  if(document.pressed == 'exit')
+		  {
+		    document.createbadge.action ="/storebadge";
+		  }
+		  return true;
+		}
+		</script>
+	</head>
+
+	<body>
+		
+		<div class="container">
+			
+			{% include "navbar.html" %}
+			
+			<hr id="space">
+
+			<div class="row">
+				<div class="span8">   
+					 <form name="createbadge" onsubmit="return onsubmitform();" enctype="multipart/form-data" method="post" class="form-horizontal">
+						<fieldset>
+						<legend>Create badge</legend>
+						<hr id="separator-line">
+    						
+						{% if added %}
+      						<p>Badge added successfully</p>
+						<hr id="separator-line">
+    						{% endif %}
+    						{% if repeat %}
+      						<p>Badge already exists</p>
+						<hr id="separator-line">
+			    			{% endif %}
+
+						<!-- Name -->
+						<div class="control-group">
+							<label class="control-label" for="name">Badge name</label>
+							<div class="controls">
+								<input name="name" id="name" required="True"></input>
+							</div>
+						</div>
+						<hr id="separator-line">    
+						<!-- Description -->
+						<div class="control-group">
+							<label class="control-label" for="description">Description</label>
+							<div class="controls">
+								<textarea name="description" id="description"></textarea>
+								<p class="help-block">Something about this badge</p>
+								<!--<a rel="popover" data-content="Something about this badge"> [?] </a>-->
+							</div>		
+						</div>
+						<hr id="separator-line">
+						<!-- Picture -->
+						<div class="control-group">
+							<label class="control-label" for="picture">Picture</label>
+							<div class="controls">
+								<input type="file" name="picture" id="picture"></input>
+								<p class="help-block">A picture of the badge</p>
+								<!--<a rel="popover" data-content="..."> [?] </a>-->
+							</div>
+						</div>
+						<hr id="separator-line">
+						<!-- Submit -->
+						<button type="submit" class="btn" name="more" onclick="document.pressed=this.name">Save and create another</button>
+						<button type="submit" class="btn" name="exit" onclick="document.pressed=this.name">Save and view badge</button>
+						<a href="/"><button type="cancel" class="btn">Cancel</button></a>	
+						</fieldset>			
+					</form>
+				</div>
+			</div>
+			{% include "footer.html" %}
+		</div>
+  	</body>
+</html>
